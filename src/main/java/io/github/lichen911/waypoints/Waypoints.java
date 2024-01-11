@@ -7,9 +7,4 @@ public final class Waypoints extends JavaPlugin {
 	public void onEnable() {
 		 getCommand(CommandLiteral.WP).setExecutor(new WpCommand(this));
 	}
-
-	@Override
-	public void onDisable() {
-		getLogger().info("onDisable has been invoked!");
-	}
 }
