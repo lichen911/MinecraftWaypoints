@@ -7,6 +7,7 @@ import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
 public class WpCommand implements CommandExecutor {
@@ -21,7 +22,7 @@ public class WpCommand implements CommandExecutor {
 	private void printHelp(Player player) {
 		player.sendMessage("Waypoints usage:");
 		player.sendMessage("wp add <name> [pub] - Add waypoint with name to either the public or private list");
-		player.sendMessage("wp del <name> [pub] - Delete a named waypoint");
+		player.sendMessage("wp rm <name> [pub] - Delete a named waypoint");
 		player.sendMessage("wp set <name> [pub] - Set compass heading to a named waypoint");
 		player.sendMessage("wp tp <name> [pub] - Teleport to a named waypoint");
 		player.sendMessage("wp list - Print a list of both public and the player's own private waypoints");
@@ -78,20 +79,33 @@ public class WpCommand implements CommandExecutor {
 	private void listWaypoint(Player player) {
 		String playerName = player.getPlayerListName();
 		String configPlayerPath = configPlayersPrefix + "." + playerName;
-		Map<String, Object> publicWaypointMap = this.plugin.getConfig()
-				.getConfigurationSection(configPublicPrefix).getValues(false);
-		Map<String, Object> privateWaypointMap = this.plugin.getConfig()
-				.getConfigurationSection(configPlayerPath).getValues(false);
-		
-		player.sendMessage("Public waypoints:");
-		for (Map.Entry<String, Object> entry : publicWaypointMap.entrySet()) {
-		    player.sendMessage("  " + entry.getKey() + " - " + entry.getValue());
+		ConfigurationSection publicWaypointMapSection = this.plugin.getConfig()
+				.getConfigurationSection(configPublicPrefix);
+		ConfigurationSection privateWaypointMapSection = this.plugin.getConfig()
+				.getConfigurationSection(configPlayerPath);
+				
+
+		if (publicWaypointMapSection != null) {
+			Map<String, Object> publicWaypointMap = publicWaypointMapSection.getValues(false);
+			
+			player.sendMessage("Public waypoints:");
+			for (Map.Entry<String, Object> entry : publicWaypointMap.entrySet()) {
+			    player.sendMessage("  " + entry.getKey() + " - " + entry.getValue());
+			}
+		} else {
+			player.sendMessage("No public waypoints");
 		}
 		
-		player.sendMessage();
-		player.sendMessage("Private waypoints:");
-		for (Map.Entry<String, Object> entry : privateWaypointMap.entrySet()) {
-		    player.sendMessage("  " + entry.getKey() + " - " + entry.getValue());
+		if (privateWaypointMapSection != null) {
+			Map<String, Object> privateWaypointMap = privateWaypointMapSection.getValues(false);
+
+			player.sendMessage();
+			player.sendMessage("Private waypoints:");
+			for (Map.Entry<String, Object> entry : privateWaypointMap.entrySet()) {
+			    player.sendMessage("  " + entry.getKey() + " - " + entry.getValue());
+			}
+		} else {
+			player.sendMessage("No private waypoints");
 		}
 	}
 	
