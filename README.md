@@ -17,3 +17,4 @@ wp set <name> [pub] - Set compass heading to a named waypoint
 wp tp <name> [pub] - Teleport to a named waypoint
 wp list - Print a list of both public and the player's own private waypoints
 ```
+![usage detail](images/usage.png)
