@@ -124,7 +124,6 @@ public class WpCommand implements CommandExecutor {
 		
 	}
 	
-	
 	private void tpWaypoint(Player player, String wpName, String wpType) {
 		Location location = this.getLocationFromConfig(player, wpName, wpType);
 		if (location != null) {
