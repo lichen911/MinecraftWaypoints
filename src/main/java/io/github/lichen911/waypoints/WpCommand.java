@@ -18,6 +18,15 @@ public class WpCommand implements CommandExecutor {
 		this.plugin = plugin;
 	}
 	
+	private void printHelp(Player player) {
+		player.sendMessage("Waypoints usage:");
+		player.sendMessage("wp add <name> [pub] - Add waypoint with name to either the public or private list");
+		player.sendMessage("wp del <name> [pub] - Delete a named waypoint");
+		player.sendMessage("wp set <name> [pub] - Set compass heading to a named waypoint");
+		player.sendMessage("wp tp <name> [pub] - Teleport to a named waypoint");
+		player.sendMessage("wp list - Print a list of both public and the player's own private waypoints");
+	}
+	
 	private String getConfigPath(String playerName, String wpName, String wpType) {
     	String configPath;
     	if (wpType.equals(CommandLiteral.PUB)) {
@@ -111,8 +120,7 @@ public class WpCommand implements CommandExecutor {
         	if (cmd.equals(CommandLiteral.LIST)) {
         		this.listWaypoint(player);
         	} else {
-        		player.sendMessage("Invalid command");
-        		// Implement logic to print help
+        		this.printHelp(player);
         	}
         } else if (split.length >= 2 && split.length <= 3) {
         	String cmd = split[0];
@@ -123,8 +131,7 @@ public class WpCommand implements CommandExecutor {
         		wpType = split[2];
         		
         		if (!wpType.equals(CommandLiteral.PUB)) {
-            		player.sendMessage("Invalid command");
-            		// Implement logic to print help
+            		this.printHelp(player);
             		return true;
         		}
         	}
@@ -139,8 +146,7 @@ public class WpCommand implements CommandExecutor {
             	this.tpWaypoint(player, wpName, wpType);
             }
         } else {
-        	player.sendMessage("Invalid command");
-        	// Print help message here
+        	this.printHelp(player);
         }
         
         return true;

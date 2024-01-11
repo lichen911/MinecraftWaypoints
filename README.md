@@ -1,7 +1,7 @@
 ### Waypoints Plugin
-This project is a plugin for Bukkit bassed Minecraft servers to add the use of Waypoints.
+This project is a plugin for Bukkit based Minecraft servers to add the use of Waypoints.
 
-This plugin allows users to set named Waypoints from their current location both publicly and privately. The waypoints are stored in the plugin's config.yml, and then users may either set their compass heading to one of the stored waypoints or teleport directly to it.
+This plugin allows users to set named Waypoints from their current location and store them both publicly or privately. The waypoints are stored in the plugin's config.yml, and then users may either set their compass heading to one of the stored waypoints or teleport directly to it.
 
 #### Usage
 The following commands allow you to manage the waypoints, set them as a compass heading, or teleport directly to them. The `pub` arg is optional and is used to indicate the player is referring to public waypoints (instead of their private waypoints)
