@@ -1,0 +1,1 @@
+Minecraft Bukkit server plugin to manage and use waypoints.
