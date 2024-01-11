@@ -43,14 +43,18 @@ public class WpCommand implements CommandExecutor {
 		String playerName = player.getPlayerListName();
 		String configPath = this.getConfigPath(playerName, wpName, wpType);
 		String coords = this.plugin.getConfig().getString(configPath);
-		String[] coordArray = coords.split("\\s+");
 		
-		double x = (double) Integer.parseInt(coordArray[0]);
-		double y = (double) Integer.parseInt(coordArray[1]);
-		double z = (double) Integer.parseInt(coordArray[2]);
-
-		// TODO: Review to see if we should ensure that World is always the Overworld?
-		Location location = new Location(player.getWorld(), x, y, z);
+		Location location = null;
+		if (coords != null) {
+			String[] coordArray = coords.split("\\s+");
+			
+			double x = (double) Integer.parseInt(coordArray[0]);
+			double y = (double) Integer.parseInt(coordArray[1]);
+			double z = (double) Integer.parseInt(coordArray[2]);
+	
+			// TODO: Review to see if we should ensure that World is always the Overworld?
+			location = new Location(player.getWorld(), x, y, z);
+		}
 		return location;
 	}
 	
@@ -111,15 +115,24 @@ public class WpCommand implements CommandExecutor {
 	
 	private void setWaypoint(Player player, String wpName, String wpType) {
 		Location location = this.getLocationFromConfig(player, wpName, wpType);
-		player.setCompassTarget(location);
-		player.sendMessage("Set compass to waypoint '" + wpName + "'");
+		if (location != null) {
+			player.setCompassTarget(location);
+			player.sendMessage("Set compass to waypoint '" + wpName + "'");
+		} else {
+			player.sendMessage("Waypoint does not exist");
+		}
+		
 	}
 	
 	
 	private void tpWaypoint(Player player, String wpName, String wpType) {
-		player.sendMessage("Teleporting to waypoint '" + wpName + "'");
 		Location location = this.getLocationFromConfig(player, wpName, wpType);
-		player.teleport(location);
+		if (location != null) {
+			player.sendMessage("Teleporting to waypoint '" + wpName + "'");
+			player.teleport(location);
+		} else {
+			player.sendMessage("Waypoint does not exist");
+		}
 	}
 	
     public boolean onCommand(CommandSender sender, Command command, String label, String[] split) {
