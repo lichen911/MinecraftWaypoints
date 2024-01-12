@@ -142,12 +142,13 @@ public class WpCommand implements CommandExecutor {
         if (location != null) {
             player.sendMessage("Teleporting to waypoint '" + wpName + "'");
             player.teleport(location);
+
+            // Whenever a player teleports first store their current location in
+            // a waypoint named "last".
+            this.addWaypoint(player, prevWorldName, "last", CommandLiteral.PRIV, prevLocation);
         } else {
             player.sendMessage("Waypoint does not exist");
         }
-        // Whenever a player teleports first store their current location in
-        // a waypoint named "last".
-        this.addWaypoint(player, prevWorldName, "last", CommandLiteral.PRIV, prevLocation);
     }
 
     public boolean onCommand(CommandSender sender, Command command, String label, String[] split) {
