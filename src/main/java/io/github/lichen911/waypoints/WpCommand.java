@@ -13,138 +13,138 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
 public class WpCommand implements CommandExecutor {
-	private final Waypoints plugin;
-	private final String configPublicPrefix = "waypoints.public";
-	private final String configPlayersPrefix = "waypoints.players";
-	
-	public WpCommand(Waypoints plugin) {
-		this.plugin = plugin;
-	}
-	
-	private void printHelp(Player player) {
-	    player.sendMessage("Waypoints usage:");
+    private final Waypoints plugin;
+    private final String configPublicPrefix = "waypoints.public";
+    private final String configPlayersPrefix = "waypoints.players";
+    
+    public WpCommand(Waypoints plugin) {
+        this.plugin = plugin;
+    }
+    
+    private void printHelp(Player player) {
+        player.sendMessage("Waypoints usage:");
         player.sendMessage("wp add <name> [pub] - Add waypoint with name to either the public or private list");
         player.sendMessage("wp rm <name> [pub] - Delete a named waypoint");
         player.sendMessage("wp set <name> [pub] - Set compass heading to a named waypoint");
         player.sendMessage("wp tp <name> [pub] - Teleport to a named waypoint");
         player.sendMessage("wp list - Print a list of both public and the player's own private waypoints");
-	}
-	
-	private String getConfigPath(String playerName, String wpName, String wpType) {
+    }
+    
+    private String getConfigPath(String playerName, String wpName, String wpType) {
         String configPath;
         if (wpType.equals(CommandLiteral.PUB)) {
-    		configPath = configPublicPrefix + "." + wpName;
-    	} else {
-    		configPath = configPlayersPrefix + "." + playerName + "." + wpName;
-    	}
-    	
-    	return configPath;
-	}
-	
-	private Location getLocationFromConfig(Player player, String wpName, String wpType) {
-		String playerName = player.getPlayerListName();
-		String configPath = this.getConfigPath(playerName, wpName, wpType);
-		String coord = this.plugin.getConfig().getString(configPath);
-		
-		Location location = null;
-		if (coord != null) {
-			String[] coordArray = coord.split("\\s+");
-			
-			double x = (double) Integer.parseInt(coordArray[0]);
-			double y = (double) Integer.parseInt(coordArray[1]);
-			double z = (double) Integer.parseInt(coordArray[2]);
-			
-			String worldName = coordArray[3];
-			World world = Bukkit.getWorld(worldName);
-	
-			location = new Location(world, x, y, z);
-		}
-		return location;
-	}
-	
-	private void addWaypoint(Player player, String wpName, String wpType) {
-	    Location location = player.getLocation();
-	    String playerName = player.getPlayerListName();
-    	String coord = location.getBlockX() + " " + location.getBlockY() + " " + location.getBlockZ();
-    	String configPath = this.getConfigPath(playerName, wpName, wpType);
-    	String worldName = player.getWorld().getName();
-    	
-    	player.sendMessage("Creating waypoint named '" + wpName + "' at " + coord);
-    	this.plugin.getConfig().set(configPath, coord + " " + worldName);
-    	this.plugin.saveConfig();
-		
-	}
-	
-	private void delWaypoint(Player player, String wpName, String wpType) {
-	    String playerName = player.getPlayerListName();
-    	String configPath = this.getConfigPath(playerName, wpName, wpType);
-    	
-    	player.sendMessage("Deleting waypoint named '" + wpName + "'");
-    	this.plugin.getConfig().set(configPath, null);
-    	this.plugin.saveConfig();
-		
-	}
-	
-	private void printWaypointConfigMap(ConfigurationSection waypointMapConfigSection, Player player, String wpTypeDesc) {
-		if (waypointMapConfigSection != null) {
-			Map<String, Object> publicWaypointMap = waypointMapConfigSection.getValues(false);
-			
-			player.sendMessage(wpTypeDesc + " waypoints:");
-			for (Map.Entry<String, Object> entry : publicWaypointMap.entrySet()) {
-				String coordStr = (String) entry.getValue();
-				String[] coordArray = coordStr.split("\\s+");
-				String x = coordArray[0];
-				String y = coordArray[1];
-				String z = coordArray[2];
-				String world = coordArray[3];
-				
-			    player.sendMessage("  " + entry.getKey() + " -> " + x + ", " + y + ", " + z + " [" + world + "]");
-			}
-		} else {
-			player.sendMessage("No " + wpTypeDesc + " waypoints");
-		}
-	}
-	
-	private void listWaypoint(Player player) {
-		String playerName = player.getPlayerListName();
-		String configPlayerPath = configPlayersPrefix + "." + playerName;
-		ConfigurationSection publicWaypointMapSection = this.plugin.getConfig()
-				.getConfigurationSection(configPublicPrefix);
-		ConfigurationSection privateWaypointMapSection = this.plugin.getConfig()
-				.getConfigurationSection(configPlayerPath);
-				
+            configPath = configPublicPrefix + "." + wpName;
+        } else {
+            configPath = configPlayersPrefix + "." + playerName + "." + wpName;
+        }
+        
+        return configPath;
+    }
+    
+    private Location getLocationFromConfig(Player player, String wpName, String wpType) {
+        String playerName = player.getPlayerListName();
+        String configPath = this.getConfigPath(playerName, wpName, wpType);
+        String coord = this.plugin.getConfig().getString(configPath);
+        
+        Location location = null;
+        if (coord != null) {
+            String[] coordArray = coord.split("\\s+");
+            
+            double x = (double) Integer.parseInt(coordArray[0]);
+            double y = (double) Integer.parseInt(coordArray[1]);
+            double z = (double) Integer.parseInt(coordArray[2]);
+            
+            String worldName = coordArray[3];
+            World world = Bukkit.getWorld(worldName);
+    
+            location = new Location(world, x, y, z);
+        }
+        return location;
+    }
+    
+    private void addWaypoint(Player player, String wpName, String wpType) {
+        Location location = player.getLocation();
+        String playerName = player.getPlayerListName();
+        String coord = location.getBlockX() + " " + location.getBlockY() + " " + location.getBlockZ();
+        String configPath = this.getConfigPath(playerName, wpName, wpType);
+        String worldName = player.getWorld().getName();
+        
+        player.sendMessage("Creating waypoint named '" + wpName + "' at " + coord);
+        this.plugin.getConfig().set(configPath, coord + " " + worldName);
+        this.plugin.saveConfig();
+        
+    }
+    
+    private void delWaypoint(Player player, String wpName, String wpType) {
+        String playerName = player.getPlayerListName();
+        String configPath = this.getConfigPath(playerName, wpName, wpType);
+        
+        player.sendMessage("Deleting waypoint named '" + wpName + "'");
+        this.plugin.getConfig().set(configPath, null);
+        this.plugin.saveConfig();
+        
+    }
+    
+    private void printWaypointConfigMap(ConfigurationSection waypointMapConfigSection, Player player, String wpTypeDesc) {
+        if (waypointMapConfigSection != null) {
+            Map<String, Object> publicWaypointMap = waypointMapConfigSection.getValues(false);
+            
+            player.sendMessage(wpTypeDesc + " waypoints:");
+            for (Map.Entry<String, Object> entry : publicWaypointMap.entrySet()) {
+                String coordStr = (String) entry.getValue();
+                String[] coordArray = coordStr.split("\\s+");
+                String x = coordArray[0];
+                String y = coordArray[1];
+                String z = coordArray[2];
+                String world = coordArray[3];
+                
+                player.sendMessage("  " + entry.getKey() + " -> " + x + ", " + y + ", " + z + " [" + world + "]");
+            }
+        } else {
+            player.sendMessage("No " + wpTypeDesc + " waypoints");
+        }
+    }
+    
+    private void listWaypoint(Player player) {
+        String playerName = player.getPlayerListName();
+        String configPlayerPath = configPlayersPrefix + "." + playerName;
+        ConfigurationSection publicWaypointMapSection = this.plugin.getConfig()
+                .getConfigurationSection(configPublicPrefix);
+        ConfigurationSection privateWaypointMapSection = this.plugin.getConfig()
+                .getConfigurationSection(configPlayerPath);
+                
 
-		this.printWaypointConfigMap(publicWaypointMapSection, player, "public");
-		this.printWaypointConfigMap(privateWaypointMapSection, player, "private");
-		
-	}
-	
-	private void setWaypoint(Player player, String wpName, String wpType) {
-		Location location = this.getLocationFromConfig(player, wpName, wpType);
-		if (location != null) {
-			player.setCompassTarget(location);
-			player.sendMessage("Set compass to waypoint '" + wpName + "'");
-		} else {
-			player.sendMessage("Waypoint does not exist");
-		}
-		
-	}
-	
-	
-	private void tpWaypoint(Player player, String wpName, String wpType) {
-	    // Whenever a player teleports first store their current location in
-	    // a waypoint named "last".
-	    this.addWaypoint(player, "last", wpType);
-	    
-		Location location = this.getLocationFromConfig(player, wpName, wpType);
-		if (location != null) {
-			player.sendMessage("Teleporting to waypoint '" + wpName + "'");
-			player.teleport(location);
-		} else {
-			player.sendMessage("Waypoint does not exist");
-		}
-	}
-	
+        this.printWaypointConfigMap(publicWaypointMapSection, player, "public");
+        this.printWaypointConfigMap(privateWaypointMapSection, player, "private");
+        
+    }
+    
+    private void setWaypoint(Player player, String wpName, String wpType) {
+        Location location = this.getLocationFromConfig(player, wpName, wpType);
+        if (location != null) {
+            player.setCompassTarget(location);
+            player.sendMessage("Set compass to waypoint '" + wpName + "'");
+        } else {
+            player.sendMessage("Waypoint does not exist");
+        }
+        
+    }
+    
+    
+    private void tpWaypoint(Player player, String wpName, String wpType) {
+        // Whenever a player teleports first store their current location in
+        // a waypoint named "last".
+        this.addWaypoint(player, "last", wpType);
+        
+        Location location = this.getLocationFromConfig(player, wpName, wpType);
+        if (location != null) {
+            player.sendMessage("Teleporting to waypoint '" + wpName + "'");
+            player.teleport(location);
+        } else {
+            player.sendMessage("Waypoint does not exist");
+        }
+    }
+    
 
     public boolean onCommand(CommandSender sender, Command command, String label, String[] split) {
         if (!(sender instanceof Player)) {
