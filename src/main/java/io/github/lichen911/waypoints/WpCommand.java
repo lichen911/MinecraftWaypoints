@@ -22,17 +22,17 @@ public class WpCommand implements CommandExecutor {
 	}
 	
 	private void printHelp(Player player) {
-		player.sendMessage("Waypoints usage:");
-		player.sendMessage("wp add <name> [pub] - Add waypoint with name to either the public or private list");
-		player.sendMessage("wp rm <name> [pub] - Delete a named waypoint");
-		player.sendMessage("wp set <name> [pub] - Set compass heading to a named waypoint");
-		player.sendMessage("wp tp <name> [pub] - Teleport to a named waypoint");
-		player.sendMessage("wp list - Print a list of both public and the player's own private waypoints");
+	    player.sendMessage("Waypoints usage:");
+        player.sendMessage("wp add <name> [pub] - Add waypoint with name to either the public or private list");
+        player.sendMessage("wp rm <name> [pub] - Delete a named waypoint");
+        player.sendMessage("wp set <name> [pub] - Set compass heading to a named waypoint");
+        player.sendMessage("wp tp <name> [pub] - Teleport to a named waypoint");
+        player.sendMessage("wp list - Print a list of both public and the player's own private waypoints");
 	}
 	
 	private String getConfigPath(String playerName, String wpName, String wpType) {
-    	String configPath;
-    	if (wpType.equals(CommandLiteral.PUB)) {
+        String configPath;
+        if (wpType.equals(CommandLiteral.PUB)) {
     		configPath = configPublicPrefix + "." + wpName;
     	} else {
     		configPath = configPlayersPrefix + "." + playerName + "." + wpName;
@@ -63,8 +63,8 @@ public class WpCommand implements CommandExecutor {
 	}
 	
 	private void addWaypoint(Player player, String wpName, String wpType) {
-		Location location = player.getLocation();
-		String playerName = player.getPlayerListName();
+	    Location location = player.getLocation();
+	    String playerName = player.getPlayerListName();
     	String coord = location.getBlockX() + " " + location.getBlockY() + " " + location.getBlockZ();
     	String configPath = this.getConfigPath(playerName, wpName, wpType);
     	String worldName = player.getWorld().getName();
@@ -76,7 +76,7 @@ public class WpCommand implements CommandExecutor {
 	}
 	
 	private void delWaypoint(Player player, String wpName, String wpType) {
-		String playerName = player.getPlayerListName();
+	    String playerName = player.getPlayerListName();
     	String configPath = this.getConfigPath(playerName, wpName, wpType);
     	
     	player.sendMessage("Deleting waypoint named '" + wpName + "'");
