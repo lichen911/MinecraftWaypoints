@@ -105,7 +105,7 @@ public class WpCommand implements CommandExecutor {
         if (waypointMapConfigSection != null) {
             Map<String, Object> publicWaypointMap = waypointMapConfigSection.getValues(false);
 
-            player.sendMessage(ChatColor.RED + wpTypeDesc + " waypoints:");
+            player.sendMessage(ChatColor.RED + wpTypeDesc + " waypoints" + ChatColor.WHITE + ":");
             for (Map.Entry<String, Object> entry : publicWaypointMap.entrySet()) {
                 String coordStr = (String) entry.getValue();
                 String[] coordArray = coordStr.split("\\s+");
