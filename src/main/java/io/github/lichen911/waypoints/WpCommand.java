@@ -11,10 +11,13 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
+import net.md_5.bungee.api.ChatColor;
+
 public class WpCommand implements CommandExecutor {
     private final Waypoints plugin;
     private final String configPublicPrefix = "waypoints.public";
     private final String configPlayersPrefix = "waypoints.players";
+    private final String lastWpName = "last";
 
     public WpCommand(Waypoints plugin) {
         this.plugin = plugin;
@@ -22,11 +25,14 @@ public class WpCommand implements CommandExecutor {
 
     private void printHelp(Player player) {
         player.sendMessage("Waypoints usage:");
-        player.sendMessage("wp add <name> [pub] - Add waypoint with name to either the public or private list");
-        player.sendMessage("wp rm <name> [pub] - Delete a named waypoint");
-        player.sendMessage("wp set <name> [pub] - Set compass heading to a named waypoint");
-        player.sendMessage("wp tp <name> [pub] - Teleport to a named waypoint");
-        player.sendMessage("wp list - Print a list of both public and the player's own private waypoints");
+        player.sendMessage(ChatColor.BLUE + "wp add <name> [pub] " + ChatColor.WHITE
+                + "- Add waypoint with name to either the public or private list");
+        player.sendMessage(ChatColor.BLUE + "wp rm <name> [pub] " + ChatColor.WHITE + "- Delete a named waypoint");
+        player.sendMessage(ChatColor.BLUE + "wp set <name> [pub] " + ChatColor.WHITE
+                + "- Set compass heading to a named waypoint");
+        player.sendMessage(ChatColor.BLUE + "wp tp <name> [pub] " + ChatColor.WHITE + "- Teleport to a named waypoint");
+        player.sendMessage(ChatColor.BLUE + "wp list " + ChatColor.WHITE
+                + "- Print a list of both public and the player's own private waypoints");
     }
 
     private String getConfigPath(String playerName, String wpName, String wpType) {
@@ -68,7 +74,12 @@ public class WpCommand implements CommandExecutor {
         String coord = location.getBlockX() + " " + location.getBlockY() + " " + location.getBlockZ();
         String configPath = this.getConfigPath(playerName, wpName, wpType);
 
-        player.sendMessage("Creating waypoint named '" + wpName + "' at " + coord);
+        // Do not display the message if the waypoint is named "last" since this is an
+        // automatically created waypoint.
+        if (!wpName.equals(lastWpName)) {
+            player.sendMessage("Creating waypoint named '" + ChatColor.YELLOW + wpName + ChatColor.WHITE + "' at "
+                    + ChatColor.YELLOW + coord);
+        }
         this.plugin.getConfig().set(configPath, coord + " " + worldName);
         this.plugin.saveConfig();
     }
@@ -83,7 +94,7 @@ public class WpCommand implements CommandExecutor {
         String playerName = player.getPlayerListName();
         String configPath = this.getConfigPath(playerName, wpName, wpType);
 
-        player.sendMessage("Deleting waypoint named '" + wpName + "'");
+        player.sendMessage("Deleting waypoint named '" + ChatColor.YELLOW + wpName + ChatColor.WHITE + "'");
         this.plugin.getConfig().set(configPath, null);
         this.plugin.saveConfig();
 
@@ -94,7 +105,7 @@ public class WpCommand implements CommandExecutor {
         if (waypointMapConfigSection != null) {
             Map<String, Object> publicWaypointMap = waypointMapConfigSection.getValues(false);
 
-            player.sendMessage(wpTypeDesc + " waypoints:");
+            player.sendMessage(ChatColor.RED + wpTypeDesc + " waypoints:");
             for (Map.Entry<String, Object> entry : publicWaypointMap.entrySet()) {
                 String coordStr = (String) entry.getValue();
                 String[] coordArray = coordStr.split("\\s+");
@@ -103,7 +114,9 @@ public class WpCommand implements CommandExecutor {
                 String z = coordArray[2];
                 String world = coordArray[3];
 
-                player.sendMessage("  " + entry.getKey() + " -> " + x + ", " + y + ", " + z + " [" + world + "]");
+                player.sendMessage("  " + ChatColor.BLUE + entry.getKey() + ChatColor.WHITE + " -> " + ChatColor.YELLOW
+                        + x + ChatColor.WHITE + ", " + ChatColor.YELLOW + y + ChatColor.WHITE + ", " + ChatColor.YELLOW
+                        + z + ChatColor.WHITE + " [" + ChatColor.YELLOW + world + ChatColor.WHITE + "]");
             }
         } else {
             player.sendMessage("No " + wpTypeDesc + " waypoints");
@@ -127,7 +140,7 @@ public class WpCommand implements CommandExecutor {
         Location location = this.getLocationFromConfig(player, wpName, wpType);
         if (location != null) {
             player.setCompassTarget(location);
-            player.sendMessage("Set compass to waypoint '" + wpName + "'");
+            player.sendMessage("Set compass to waypoint '" + ChatColor.YELLOW + wpName + ChatColor.WHITE + "'");
         } else {
             player.sendMessage("Waypoint does not exist");
         }
@@ -140,12 +153,12 @@ public class WpCommand implements CommandExecutor {
 
         Location location = this.getLocationFromConfig(player, wpName, wpType);
         if (location != null) {
-            player.sendMessage("Teleporting to waypoint '" + wpName + "'");
+            player.sendMessage("Teleporting to waypoint '" + ChatColor.YELLOW + wpName + ChatColor.WHITE + "'");
             player.teleport(location);
 
             // Whenever a player teleports first store their current location in
             // a waypoint named "last".
-            this.addWaypoint(player, prevWorldName, "last", CommandLiteral.PRIV, prevLocation);
+            this.addWaypoint(player, prevWorldName, lastWpName, CommandLiteral.PRIV, prevLocation);
         } else {
             player.sendMessage("Waypoint does not exist");
         }
