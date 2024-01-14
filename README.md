@@ -1,4 +1,5 @@
 ### Waypoints Plugin
+Check out the Spigots MC resources page for the most up to date detail on this plugin - [https://www.spigotmc.org/resources/waypoints.114447/](https://www.spigotmc.org/resources/waypoints.114447/)
 ---
 #### What is it?
 This project is a plugin for Bukkit based Minecraft servers to add the use of Waypoints.
