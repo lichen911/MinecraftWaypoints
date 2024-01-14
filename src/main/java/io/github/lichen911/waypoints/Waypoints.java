@@ -13,6 +13,5 @@ public final class Waypoints extends JavaPlugin {
         WpConfig.saveDefaultConfig();
 
         getCommand(CommandLiteral.WP).setExecutor(new WpCommand(this));
-
     }
 }
