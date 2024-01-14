@@ -34,5 +34,5 @@ jobs:
     - name: Upload artifacts
       uses: actions/upload-artifact@v3
       with:
-        name: Waypoints-${{ env.RELEASE_VERSION }}.jar
-        path: target/Waypoints-${{ env.RELEASE_VERSION }}.jar
+        name: Waypoints-build-artifacts
+        path: target
