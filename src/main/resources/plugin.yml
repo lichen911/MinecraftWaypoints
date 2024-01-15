@@ -12,13 +12,13 @@ permissions:
     default: true
   waypoints.public.add:
     description: Allows users to add waypoints to the public list
-    default: false
+    default: true
   waypoints.private.rm:
     description: Allows users to remove waypoints from their private list
     default: true
   waypoints.public.rm:
     description: Allows users to remove waypoints from the public list
-    default: false
+    default: true
   waypoints.private.set:
     description: Allows users to set their compass heading to a waypoint on their private
     default: true
