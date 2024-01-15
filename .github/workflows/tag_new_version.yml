@@ -5,9 +5,6 @@ on:
     branches:
       - add_workflow
       - main
-  pull_request:
-    branches:
-      - main
 
 jobs:
   tag-new-versions:
@@ -26,7 +23,9 @@ jobs:
         run: |
           RELEASE_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
           if git show-ref --tags --verify --quiet "refs/tags/${RELEASE_VERSION}"; then
-            echo "Tag ${TAG} exists"
+            echo "Tag ${TAG} exists, not creating a new tag"
           else
             echo "Tag ${TAG} does not exist - creating new tag"
+            git tag ${RELEASE_VERSION}
+            git push origin ${RELEASE_VERSION}
           fi
