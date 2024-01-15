@@ -239,7 +239,7 @@ public class WpCommand implements CommandExecutor {
         } catch (
 
         NoPermissionException ex) {
-            player.sendMessage("Player does not have permission");
+            player.sendMessage(ChatColor.YELLOW + "Player does not have permission");
         }
 
         return true;
