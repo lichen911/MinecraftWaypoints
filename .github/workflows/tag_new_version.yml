@@ -3,6 +3,7 @@ name: Test build of plugin
 on:
   push:
     branches:
+      - add_workflow
       - main
   pull_request:
     branches:
@@ -12,10 +13,20 @@ jobs:
   tag-new-versions:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout repository
+        uses: actions/checkout@v3
         with:
-          fetch-depth: 2
-      - uses: salsify/action-detect-and-tag-new-version@v2
-        with:
-          version-command: |
-            mvn help:evaluate -Dexpression=project.version -q -DforceStdout
+          fetch-depth: 0
+
+      # - name: Set package version env variable
+      #   run: |
+      #     echo "RELEASE_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
+
+      - name: Check for Tag
+        run: |
+          RELEASE_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          if git show-ref --tags --verify --quiet "refs/tags/${RELEASE_VERSION}"; then
+            echo "Tag ${TAG} exists"
+          else
+            echo "Tag ${TAG} does not exist"
+          fi
