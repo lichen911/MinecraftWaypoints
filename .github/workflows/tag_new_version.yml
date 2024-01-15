@@ -28,5 +28,5 @@ jobs:
           if git show-ref --tags --verify --quiet "refs/tags/${RELEASE_VERSION}"; then
             echo "Tag ${TAG} exists"
           else
-            echo "Tag ${TAG} does not exist"
+            echo "Tag ${TAG} does not exist - creating new tag"
           fi
