@@ -5,7 +5,7 @@
 
 	<groupId>io.github.lichen911</groupId>
 	<artifactId>Waypoints</artifactId>
-	<version>1.6.0</version>
+	<version>1.7.0</version>
 
 	<build>
 		<plugins>
