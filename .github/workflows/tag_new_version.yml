@@ -20,12 +20,14 @@ jobs:
       #     echo "RELEASE_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
 
       - name: Check for Tag
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          RELEASE_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
-          if git show-ref --tags --verify --quiet "refs/tags/v${RELEASE_VERSION}"; then
-            echo "Tag ${TAG} exists, not creating a new tag"
+          RELEASE_VERSION=v$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          if git show-ref --tags --verify --quiet "refs/tags/${RELEASE_VERSION}"; then
+            echo "Tag ${RELEASE_VERSION} exists, not creating a new tag"
           else
-            echo "Tag ${TAG} does not exist - creating new tag"
-            git tag v${RELEASE_VERSION}
-            git push origin v${RELEASE_VERSION}
+            echo "Tag ${RELEASE_VERSION} does not exist - creating new tag"
+            git tag ${RELEASE_VERSION}
+            git push origin ${RELEASE_VERSION}
           fi
