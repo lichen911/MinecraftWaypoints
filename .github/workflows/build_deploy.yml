@@ -34,7 +34,8 @@ jobs:
 
     - name: Set package version env variable
       run: |
-        echo "RELEASE_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
+        RELEASE_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+        echo "RELEASE_VERSION=${RELEASE_VERSION}" >> $GITHUB_ENV
         echo "TAG_NAME=v${RELEASE_VERSION}" >> $GITHUB_ENV
 
     - name: Create new tag
