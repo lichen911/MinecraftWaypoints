@@ -3,7 +3,6 @@ name: Create tag for new version
 on:
   push:
     branches:
-      - add_workflow
       - main
 
 jobs:
