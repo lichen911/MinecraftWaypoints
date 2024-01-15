@@ -171,6 +171,26 @@ public class WpCommand implements CommandExecutor {
         }
     }
 
+    public String getPermissionPath(String cmd, String wpType) {
+        String subCmd = cmd.toString().toLowerCase();
+
+        String permPath;
+        if (wpType != null) {
+            permPath = "waypoints." + wpType + "." + subCmd;
+        } else {
+            permPath = "waypoints." + subCmd;
+        }
+        return permPath;
+    }
+
+    public boolean checkHasPermission(Player player, String cmd, String wpType) throws NoPermissionException {
+        if (player.hasPermission(this.getPermissionPath(cmd, wpType))) {
+            return true;
+        }
+
+        throw new NoPermissionException();
+    }
+
     public boolean onCommand(CommandSender sender, Command command, String label, String[] split) {
         if (!(sender instanceof Player)) {
             sender.sendMessage("This command can only be run by a player.");
@@ -178,40 +198,48 @@ public class WpCommand implements CommandExecutor {
         }
         Player player = (Player) sender;
 
-        if (split.length == 1) {
-            String cmd = split[0];
-            if (cmd.equals(CommandLiteral.LIST)) {
-                this.listWaypoint(player);
-            } else {
-                this.printHelp(player);
-            }
-        } else if (split.length >= 2 && split.length <= 3) {
-            String cmd = split[0];
-            String wpName = split[1];
-            String wpType = wpTypeNamePriv;
-
-            if (split.length == 3) {
-                if (!split[2].equals(CommandLiteral.PUB)) {
-                    this.printHelp(player);
-                    return true;
+        try {
+            if (split.length == 1) {
+                String cmd = split[0];
+                if (cmd.equals(CommandLiteral.LIST)) {
+                    this.checkHasPermission(player, cmd, null);
+                    this.listWaypoint(player);
                 } else {
-                    wpType = wpTypeNamePub;
+                    this.printHelp(player);
                 }
-            }
+            } else if (split.length >= 2 && split.length <= 3) {
+                String cmd = split[0];
+                String wpName = split[1];
+                String wpType = wpTypeNamePriv;
 
-            if (cmd.equals(CommandLiteral.ADD)) {
-                this.addWaypoint(player, wpName, wpType);
-            } else if (cmd.equals(CommandLiteral.RM)) {
-                this.delWaypoint(player, wpName, wpType);
-            } else if (cmd.equals(CommandLiteral.SET)) {
-                this.setWaypoint(player, wpName, wpType);
-            } else if (cmd.equals(CommandLiteral.TP)) {
-                this.tpWaypoint(player, wpName, wpType);
+                if (split.length == 3) {
+                    if (!split[2].equals(CommandLiteral.PUB)) {
+                        this.printHelp(player);
+                        return true;
+                    } else {
+                        wpType = wpTypeNamePub;
+                    }
+                }
+
+                this.checkHasPermission(player, cmd, wpType);
+                if (cmd.equals(CommandLiteral.ADD)) {
+                    this.addWaypoint(player, wpName, wpType);
+                } else if (cmd.equals(CommandLiteral.RM)) {
+                    this.delWaypoint(player, wpName, wpType);
+                } else if (cmd.equals(CommandLiteral.SET)) {
+                    this.setWaypoint(player, wpName, wpType);
+                } else if (cmd.equals(CommandLiteral.TP)) {
+                    this.tpWaypoint(player, wpName, wpType);
+                } else {
+                    this.printHelp(player);
+                }
             } else {
                 this.printHelp(player);
             }
-        } else {
-            this.printHelp(player);
+        } catch (
+
+        NoPermissionException ex) {
+            player.sendMessage("Player does not have permission");
         }
 
         return true;
