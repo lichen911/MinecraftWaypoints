@@ -3,6 +3,7 @@ name: Build and deploy plugin
 on:
   push:
     branches:
+      - add_workflow
       - main
 
 jobs:
@@ -46,9 +47,11 @@ jobs:
           echo "Tag ${{ env.TAG_NAME }} does not exist - creating new tag"
           git tag ${{ env.TAG_NAME }}
           git push origin ${{ env.TAG_NAME }}
+          echo "NEW_TAG=true" >> $GITHUB_ENV
         fi
 
     - name: Create a GitHub Release
+      if: ${{ env.NEW_TAG == 'true' }}
       uses: ncipollo/release-action@v1
       with:
         artifacts: "target/Waypoints-${{ env.RELEASE_VERSION }}.jar"
