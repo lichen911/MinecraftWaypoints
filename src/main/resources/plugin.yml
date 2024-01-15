@@ -1,8 +1,36 @@
 name: Waypoints
 main: io.github.lichen911.waypoints.Waypoints
-version: 1.9.0
+version: 1.10.0
 api-version: 1.20
 commands:
   wp:
     description: Manage and use waypoints.
     usage: "/wp"
+permissions:
+  waypoints.private.add:
+    description: Allows users to add waypoints to their private list
+    default: true
+  waypoints.public.add:
+    description: Allows users to add waypoints to the public list
+    default: true
+  waypoints.private.rm:
+    description: Allows users to remove waypoints from their private list
+    default: true
+  waypoints.public.rm:
+    description: Allows users to remove waypoints from the public list
+    default: true
+  waypoints.private.set:
+    description: Allows users to set their compass heading to a waypoint on their private
+    default: true
+  waypoints.public.set:
+    description: Allows users to set their compass heading to a waypoint on the public list
+    default: true
+  waypoints.private.tp:
+    description: Allows users to teleport to a waypoint on their private list
+    default: true
+  waypoints.public.tp:
+    description: Allows users to teleport to a waypoint on the public list
+    default: true
+  waypoints.list:
+    description: Allows users to list waypoints
+    default: true
