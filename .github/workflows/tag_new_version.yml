@@ -14,10 +14,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      # - name: Set package version env variable
-      #   run: |
-      #     echo "RELEASE_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
-
       - name: Check for Tag
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
