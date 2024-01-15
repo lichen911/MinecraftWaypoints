@@ -16,7 +16,7 @@ jobs:
 
       - name: Check for Tag
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT }}
         run: |
           RELEASE_VERSION=v$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
           if git show-ref --tags --verify --quiet "refs/tags/${RELEASE_VERSION}"; then
