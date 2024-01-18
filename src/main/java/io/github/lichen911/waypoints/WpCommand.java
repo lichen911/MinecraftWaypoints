@@ -10,6 +10,9 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
 import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.TextComponent;
 
 public class WpCommand implements CommandExecutor {
     private final Waypoints plugin;
@@ -21,6 +24,7 @@ public class WpCommand implements CommandExecutor {
     private final String lastWpName = "last";
     private final String wpTypeNamePub = "public";
     private final String wpTypeNamePriv = "private";
+    private final String chatConfigPrefix = "clickableChat";
 
     public WpCommand(Waypoints plugin) {
         this.plugin = plugin;
@@ -38,7 +42,11 @@ public class WpCommand implements CommandExecutor {
                 + "- Print a list of both public and the player's own private waypoints");
     }
 
-    private String getConfigPath(String playerUuid, String wpName, String wpType) {
+    private boolean getClickableChatConfig(String setting) {
+        return this.plugin.getConfig().getBoolean(chatConfigPrefix + "." + setting);
+    }
+
+    private String getWpConfigPath(String playerUuid, String wpName, String wpType) {
         String configPath;
         if (wpType.equals(wpTypeNamePub)) {
             configPath = configPublicPrefix + "." + wpName;
@@ -51,7 +59,7 @@ public class WpCommand implements CommandExecutor {
 
     private Location getLocationFromConfig(Player player, String wpName, String wpType) {
         String playerUuid = player.getUniqueId().toString();
-        String configPath = this.getConfigPath(playerUuid, wpName, wpType) + "." + configLocPath;
+        String configPath = this.getWpConfigPath(playerUuid, wpName, wpType) + "." + configLocPath;
         Location location = Waypoints.WpConfig.getConfig().getLocation(configPath);
         return location;
     }
@@ -62,7 +70,7 @@ public class WpCommand implements CommandExecutor {
         String playerUuid = player.getUniqueId().toString();
         String playerName = player.getPlayerListName();
         String coord = location.getBlockX() + " " + location.getBlockY() + " " + location.getBlockZ();
-        String configPath = this.getConfigPath(playerUuid, wpName, wpType);
+        String configPath = this.getWpConfigPath(playerUuid, wpName, wpType);
         String playerBiome = location.getBlock().getBiome().toString();
 
         // Do not display the message if the waypoint is named "last" since this is an
@@ -86,7 +94,7 @@ public class WpCommand implements CommandExecutor {
 
     private void delWaypoint(Player player, String wpName, String wpType) {
         String playerUuid = player.getUniqueId().toString();
-        String configPath = this.getConfigPath(playerUuid, wpName, wpType);
+        String configPath = this.getWpConfigPath(playerUuid, wpName, wpType);
 
         player.sendMessage(
                 "Deleting " + wpType + " waypoint named '" + ChatColor.YELLOW + wpName + ChatColor.WHITE + "'");
@@ -95,12 +103,12 @@ public class WpCommand implements CommandExecutor {
 
     }
 
-    private void printWaypointConfigMap(ConfigurationSection waypointMapConfigSection, Player player, String wpTypeDesc,
+    private void printWaypointConfigMap(ConfigurationSection waypointMapConfigSection, Player player, String wpType,
             String configPrefix) {
         if (waypointMapConfigSection != null) {
             Map<String, Object> waypointMap = waypointMapConfigSection.getValues(false);
 
-            player.sendMessage(ChatColor.RED + wpTypeDesc + " waypoints" + ChatColor.WHITE + ":");
+            player.sendMessage(ChatColor.RED + wpType + " waypoints" + ChatColor.WHITE + ":");
             for (Map.Entry<String, Object> entry : waypointMap.entrySet()) {
                 String wpName = entry.getKey();
 
@@ -110,22 +118,50 @@ public class WpCommand implements CommandExecutor {
                 String wpBiomePath = configPrefix + "." + wpName + "." + configBiomePath;
                 String wpBiome = Waypoints.WpConfig.getConfig().getString(wpBiomePath);
 
-                this.printWaypointDetail(player, wpName, wpLoc, wpBiome);
+//                this.printWaypointDetail(player, wpName, wpLoc, wpBiome);
+                this.sendWaypointDetailMessage(player, wpName, wpLoc, wpBiome, wpType);
             }
         } else {
-            player.sendMessage("No " + wpTypeDesc + " waypoints");
+            player.sendMessage("No " + wpType + " waypoints");
         }
     }
 
-    private void printWaypointDetail(Player player, String wpName, Location location, String biome) {
-        String msg = "  " + ChatColor.BLUE + wpName + ChatColor.WHITE;
-        msg += " -> " + ChatColor.YELLOW + location.getBlockX() + ChatColor.WHITE;
-        msg += ", " + ChatColor.YELLOW + location.getBlockY() + ChatColor.WHITE;
-        msg += ", " + ChatColor.YELLOW + location.getBlockZ() + ChatColor.WHITE;
-        msg += " [" + ChatColor.YELLOW + biome + ChatColor.WHITE;
-        msg += ", " + ChatColor.YELLOW + location.getWorld().getName() + ChatColor.WHITE + "]";
+//    private void printWaypointDetail(Player player, String wpName, Location location, String biome) {
+//        String msg = "  " + ChatColor.BLUE + wpName + ChatColor.WHITE;
+//        msg += " -> " + ChatColor.YELLOW + location.getBlockX() + ChatColor.WHITE;
+//        msg += ", " + ChatColor.YELLOW + location.getBlockY() + ChatColor.WHITE;
+//        msg += ", " + ChatColor.YELLOW + location.getBlockZ() + ChatColor.WHITE;
+//        msg += " [" + ChatColor.YELLOW + biome + ChatColor.WHITE;
+//        msg += ", " + ChatColor.YELLOW + location.getWorld().getName() + ChatColor.WHITE + "]";
+//        msg += ChatColor.WHITE + " (" + ChatColor.GOLD + "set tp rm" + ChatColor.WHITE + ")";
+//
+//        player.sendMessage(msg);
+//    }
 
-        player.sendMessage(msg);
+    private TextComponent addClickableCommands(Player player, String wpName, String wpType) {
+        boolean useRunCmd = this.getClickableChatConfig("clicksRunCommands");
+        boolean hasSetPerm = this.checkHasPermission(player, wpName, wpType);
+
+        TextComponent msg = new TextComponent("(");
+
+    }
+
+    private void sendWaypointDetailMessage(Player player, String wpName, Location location, String biome) {
+        ComponentBuilder component = new ComponentBuilder("  ").append(wpName).color(ChatColor.BLUE).append(" -> ")
+                .color(ChatColor.WHITE).append(Integer.toString(location.getBlockX())).color(ChatColor.YELLOW)
+                .append(", ").color(ChatColor.WHITE).append(Integer.toString(location.getBlockY()))
+                .color(ChatColor.YELLOW).append(", ").color(ChatColor.WHITE)
+                .append(Integer.toString(location.getBlockZ())).color(ChatColor.YELLOW).append(" [")
+                .color(ChatColor.WHITE).append(biome).color(ChatColor.YELLOW).append(", ").color(ChatColor.WHITE)
+                .append(location.getWorld().getName()).color(ChatColor.YELLOW).append("]").color(ChatColor.WHITE);
+
+        if (this.getClickableChatConfig("useClickableChat")) {
+            // TODO: Add logic to test for Geyser users
+
+        }
+
+        BaseComponent[] msg = component.create();
+        player.spigot().sendMessage(msg);
     }
 
     private void listWaypoint(Player player) {

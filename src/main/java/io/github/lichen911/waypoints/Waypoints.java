@@ -10,6 +10,8 @@ public final class Waypoints extends JavaPlugin {
     public void onEnable() {
         Metrics metrics = new Metrics(this, 20727);
 
+        this.saveDefaultConfig();
+
         WpConfig = new ConfigReader(this, "", "waypoints.yml");
         WpConfig.saveDefaultConfig();
 

@@ -1,0 +1,17 @@
+# The following options are all related to the clickable chat feature.
+# This display a set of commands in the foramt of "(set tp rm)" that correlate
+# to the command line options for each named waypoint. Only commands with for
+# which the user has permission will be displayed.
+clickableChat:
+  # Enable or disable the clickable chat commands.
+  useClickableChat: true
+
+  # If true the clicks will run the commands immediately, if false it will
+  # put command suggestions into the chat box. The "rm" command will always
+  # use suggestions to prevent accidental removal of waypoints.
+  clicksRunCommands: false
+
+  # A limitation of Geyser plugin is that it doesn't support clickable chat.
+  # The below option attemps to hide clickable chat options from these users
+  # so it doesn't clutter their output, but they can still type the commands.
+  hideGeyserUsers: true
