@@ -1,6 +1,11 @@
 package io.github.lichen911.waypoints.managers;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.bukkit.Location;
+import org.bukkit.configuration.ConfigurationSection;
 
 import io.github.lichen911.waypoints.Waypoint;
 import io.github.lichen911.waypoints.enums.WaypointType;
@@ -12,12 +17,7 @@ public class WaypointManager {
     private final String configPublicPrefix = "waypoints.public";
     private final String configPlayersPrefix = "waypoints.players";
     private final String configLocPath = "loc";
-    private final String configBiomePath = "biome";
     private final String configUserPath = "userName";
-    private final String lastWpName = "last";
-    private final String wpTypeNamePub = "public";
-    private final String wpTypeNamePriv = "private";
-    private final String chatConfigPrefix = "clickableChat";
 
     public WaypointManager(ConfigReader wpConfig) {
         this.wpConfig = wpConfig;
@@ -44,10 +44,8 @@ public class WaypointManager {
         String configPath = this.getWpConfigPath(wp.getPlayerUuid(), wp.getName(), wp.getWaypointType());
         String playerName = wp.getPlayerName();
         Location location = wp.getLocation();
-        String playerBiome = location.getBlock().getBiome().toString();
 
         this.wpConfig.getConfig().set(configPath + "." + configLocPath, location);
-        this.wpConfig.getConfig().set(configPath + "." + configBiomePath, playerBiome);
         this.wpConfig.getConfig().set(configPath + "." + configUserPath, playerName);
         this.wpConfig.saveConfig();
     }
@@ -67,6 +65,32 @@ public class WaypointManager {
 
         Waypoint waypoint = new Waypoint(playerName, playerUuid, wpName, wpType, location);
         return waypoint;
+    }
 
+    private List<Waypoint> getWaypointList(String configPrefix) {
+        ConfigurationSection waypointConfigSection = this.wpConfig.getConfig().getConfigurationSection(configPrefix);
+
+        List<Waypoint> waypoints = new ArrayList<Waypoint>();
+        if (waypointConfigSection != null) {
+            Map<String, Object> waypointMap = waypointConfigSection.getValues(false);
+
+            for (Map.Entry<String, Object> entry : waypointMap.entrySet()) {
+                String wpName = entry.getKey();
+                String wpLocPath = configPrefix + "." + wpName + "." + configLocPath;
+                Location wpLoc = this.wpConfig.getConfig().getLocation(wpLocPath);
+                Waypoint waypoint = new Waypoint(null, null, wpName, WaypointType.PUBLIC, wpLoc);
+                waypoints.add(waypoint);
+            }
+        }
+        return waypoints;
+    }
+
+    public List<Waypoint> getWaypoints() {
+        return this.getWaypointList(configPublicPrefix);
+    }
+
+    public List<Waypoint> getWaypoints(String playerUuid) {
+        String configPlayerPath = configPlayersPrefix + "." + playerUuid;
+        return this.getWaypointList(configPlayerPath);
     }
 }
