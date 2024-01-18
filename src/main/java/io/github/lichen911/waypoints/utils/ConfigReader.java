@@ -8,7 +8,7 @@
  * License under GPLv3
  */
 
-package io.github.lichen911.waypoints;
+package io.github.lichen911.waypoints.utils;
 
 import java.io.File;
 import java.io.InputStream;

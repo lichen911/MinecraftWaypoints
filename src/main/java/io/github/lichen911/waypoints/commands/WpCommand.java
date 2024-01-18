@@ -1,4 +1,4 @@
-package io.github.lichen911.waypoints;
+package io.github.lichen911.waypoints.commands;
 
 import java.util.Map;
 
@@ -9,6 +9,12 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
+import io.github.lichen911.waypoints.CommandLiteral;
+import io.github.lichen911.waypoints.NoPermissionException;
+import io.github.lichen911.waypoints.Waypoint;
+import io.github.lichen911.waypoints.Waypoints;
+import io.github.lichen911.waypoints.enums.WaypointType;
+import io.github.lichen911.waypoints.managers.WaypointManager;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -16,6 +22,8 @@ import net.md_5.bungee.api.chat.TextComponent;
 
 public class WpCommand implements CommandExecutor {
     private final Waypoints plugin;
+    private final WaypointManager wpManager;
+
     private final String configPublicPrefix = "waypoints.public";
     private final String configPlayersPrefix = "waypoints.players";
     private final String configLocPath = "loc";
@@ -26,8 +34,9 @@ public class WpCommand implements CommandExecutor {
     private final String wpTypeNamePriv = "private";
     private final String chatConfigPrefix = "clickableChat";
 
-    public WpCommand(Waypoints plugin) {
+    public WpCommand(Waypoints plugin, WaypointManager wpManager) {
         this.plugin = plugin;
+        this.wpManager = wpManager;
     }
 
     private void printHelp(Player player) {
@@ -46,61 +55,27 @@ public class WpCommand implements CommandExecutor {
         return this.plugin.getConfig().getBoolean(chatConfigPrefix + "." + setting);
     }
 
-    private String getWpConfigPath(String playerUuid, String wpName, String wpType) {
-        String configPath;
-        if (wpType.equals(wpTypeNamePub)) {
-            configPath = configPublicPrefix + "." + wpName;
-        } else {
-            configPath = configPlayersPrefix + "." + playerUuid + "." + wpName;
-        }
-
-        return configPath;
-    }
-
-    private Location getLocationFromConfig(Player player, String wpName, String wpType) {
-        String playerUuid = player.getUniqueId().toString();
-        String configPath = this.getWpConfigPath(playerUuid, wpName, wpType) + "." + configLocPath;
-        Location location = Waypoints.WpConfig.getConfig().getLocation(configPath);
-        return location;
-    }
-
-    // Overloaded addWaypoint method to allow passing location that is different
-    // than player's current location
-    private void addWaypoint(Player player, String worldName, String wpName, String wpType, Location location) {
+    private void addWaypoint(Player player, String wpName, WaypointType wpType) {
         String playerUuid = player.getUniqueId().toString();
         String playerName = player.getPlayerListName();
-        String coord = location.getBlockX() + " " + location.getBlockY() + " " + location.getBlockZ();
-        String configPath = this.getWpConfigPath(playerUuid, wpName, wpType);
-        String playerBiome = location.getBlock().getBiome().toString();
 
-        // Do not display the message if the waypoint is named "last" since this is an
-        // automatically created waypoint.
-        if (!wpName.equals(lastWpName)) {
-            player.sendMessage("Creating " + wpType + " waypoint named '" + ChatColor.YELLOW + wpName + ChatColor.WHITE
-                    + "' at " + ChatColor.YELLOW + coord);
-        }
-
-        Waypoints.WpConfig.getConfig().set(configPath + "." + configLocPath, location);
-        Waypoints.WpConfig.getConfig().set(configPath + "." + configBiomePath, playerBiome);
-        Waypoints.WpConfig.getConfig().set(configPath + "." + configUserPath, playerName);
-        Waypoints.WpConfig.saveConfig();
-    }
-
-    private void addWaypoint(Player player, String wpName, String wpType) {
         Location location = player.getLocation();
-        String worldName = player.getWorld().getName();
-        this.addWaypoint(player, worldName, wpName, wpType, location);
+        Waypoint waypoint = new Waypoint(playerName, playerUuid, wpName, wpType, location);
+
+        player.sendMessage("Creating " + wpType + " waypoint named '" + ChatColor.YELLOW + wpName + ChatColor.WHITE
+                + "' at " + ChatColor.YELLOW + waypoint.getCoordString());
+
+        this.wpManager.addWaypoint(waypoint);
     }
 
-    private void delWaypoint(Player player, String wpName, String wpType) {
+    private void rmWaypoint(Player player, String wpName, WaypointType wpType) {
         String playerUuid = player.getUniqueId().toString();
-        String configPath = this.getWpConfigPath(playerUuid, wpName, wpType);
+        Waypoint waypoint = wpManager.getWaypoint(playerUuid, wpName, wpType);
 
         player.sendMessage(
                 "Deleting " + wpType + " waypoint named '" + ChatColor.YELLOW + wpName + ChatColor.WHITE + "'");
-        Waypoints.WpConfig.getConfig().set(configPath, null);
-        Waypoints.WpConfig.saveConfig();
 
+        this.wpManager.rmWaypoint(waypoint);
     }
 
     private void printWaypointConfigMap(ConfigurationSection waypointMapConfigSection, Player player, String wpType,
@@ -177,8 +152,10 @@ public class WpCommand implements CommandExecutor {
         this.printWaypointConfigMap(privateWaypointMapSection, player, wpTypeNamePriv, configPlayerPath);
     }
 
-    private void setWaypoint(Player player, String wpName, String wpType) {
-        Location location = this.getLocationFromConfig(player, wpName, wpType);
+    private void setWaypoint(Player player, String wpName, WaypointType wpType) {
+        Waypoint waypoint = this.wpManager.getWaypoint(player.getUniqueId().toString(), wpName, wpType);
+        Location location = waypoint.getLocation();
+
         if (location != null) {
             player.setCompassTarget(location);
             player.sendMessage(
@@ -189,37 +166,40 @@ public class WpCommand implements CommandExecutor {
 
     }
 
-    private void tpWaypoint(Player player, String wpName, String wpType) {
-        Location prevLocation = player.getLocation().clone();
-        String prevWorldName = player.getWorld().getName();
+    private void tpWaypoint(Player player, String wpName, WaypointType wpType) {
+        Waypoint waypoint = this.wpManager.getWaypoint(player.getUniqueId().toString(), wpName, wpType);
+        Location location = waypoint.getLocation();
 
-        Location location = this.getLocationFromConfig(player, wpName, wpType);
+        // Whenever a player teleports store their current location in
+        // a waypoint named "last".
+        Location prevLocation = player.getLocation().clone();
+        Waypoint prevWaypoint = new Waypoint(player.getDisplayName(), player.getUniqueId().toString(), lastWpName,
+                WaypointType.PRIVATE, prevLocation);
+
         if (location != null) {
             player.sendMessage(
                     "Teleporting to " + wpType + " waypoint '" + ChatColor.YELLOW + wpName + ChatColor.WHITE + "'");
             player.teleport(location);
 
-            // Whenever a player teleports first store their current location in
-            // a waypoint named "last".
-            this.addWaypoint(player, prevWorldName, lastWpName, wpTypeNamePriv, prevLocation);
+            this.wpManager.addWaypoint(prevWaypoint);
         } else {
             player.sendMessage("Waypoint does not exist");
         }
     }
 
-    public String getPermissionPath(String cmd, String wpType) {
+    public String getPermissionPath(String cmd, WaypointType wpType) {
         String subCmd = cmd.toString().toLowerCase();
 
         String permPath;
         if (wpType != null) {
-            permPath = "waypoints." + wpType + "." + subCmd;
+            permPath = "waypoints." + wpType.text + "." + subCmd;
         } else {
             permPath = "waypoints." + subCmd;
         }
         return permPath;
     }
 
-    public boolean checkHasPermission(Player player, String cmd, String wpType) throws NoPermissionException {
+    public boolean checkHasPermission(Player player, String cmd, WaypointType wpType) throws NoPermissionException {
         if (player.hasPermission(this.getPermissionPath(cmd, wpType))) {
             return true;
         }
@@ -246,14 +226,14 @@ public class WpCommand implements CommandExecutor {
             } else if (split.length >= 2 && split.length <= 3) {
                 String cmd = split[0];
                 String wpName = split[1];
-                String wpType = wpTypeNamePriv;
+                WaypointType wpType = WaypointType.PRIVATE;
 
                 if (split.length == 3) {
                     if (!split[2].equals(CommandLiteral.PUB)) {
                         this.printHelp(player);
                         return true;
                     } else {
-                        wpType = wpTypeNamePub;
+                        wpType = WaypointType.PUBLIC;
                     }
                 }
 
@@ -261,7 +241,7 @@ public class WpCommand implements CommandExecutor {
                 if (cmd.equals(CommandLiteral.ADD)) {
                     this.addWaypoint(player, wpName, wpType);
                 } else if (cmd.equals(CommandLiteral.RM)) {
-                    this.delWaypoint(player, wpName, wpType);
+                    this.rmWaypoint(player, wpName, wpType);
                 } else if (cmd.equals(CommandLiteral.SET)) {
                     this.setWaypoint(player, wpName, wpType);
                 } else if (cmd.equals(CommandLiteral.TP)) {
