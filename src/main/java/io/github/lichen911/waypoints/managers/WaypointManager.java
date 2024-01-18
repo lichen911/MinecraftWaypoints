@@ -7,8 +7,8 @@ import java.util.Map;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 
-import io.github.lichen911.waypoints.Waypoint;
 import io.github.lichen911.waypoints.enums.WaypointType;
+import io.github.lichen911.waypoints.objects.Waypoint;
 import io.github.lichen911.waypoints.utils.ConfigReader;
 
 public class WaypointManager {

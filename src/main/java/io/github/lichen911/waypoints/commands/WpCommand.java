@@ -8,12 +8,12 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import io.github.lichen911.waypoints.CommandLiteral;
 import io.github.lichen911.waypoints.NoPermissionException;
-import io.github.lichen911.waypoints.Waypoint;
 import io.github.lichen911.waypoints.Waypoints;
 import io.github.lichen911.waypoints.enums.WaypointType;
 import io.github.lichen911.waypoints.managers.WaypointManager;
+import io.github.lichen911.waypoints.objects.CommandLiteral;
+import io.github.lichen911.waypoints.objects.Waypoint;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;

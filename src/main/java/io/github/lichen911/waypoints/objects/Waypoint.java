@@ -1,4 +1,4 @@
-package io.github.lichen911.waypoints;
+package io.github.lichen911.waypoints.objects;
 
 import org.bukkit.Location;
 
