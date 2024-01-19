@@ -103,13 +103,13 @@ public class WpCommand implements CommandExecutor {
     private void listWaypoint(Player player) {
         String playerUuid = player.getUniqueId().toString();
 
-        List<Waypoint> pubWaypoints = this.wpManager.getWaypoints();
+        List<Waypoint> pubWaypoints = this.wpManager.getWaypoints(WaypointType.PUBLIC);
         player.sendMessage(ChatColor.RED + WaypointType.PUBLIC.text + " waypoints" + ChatColor.WHITE + ":");
         for (Waypoint wp : pubWaypoints) {
             this.sendWaypointDetailMessage(wp, player);
         }
 
-        List<Waypoint> privWaypoints = this.wpManager.getWaypoints(playerUuid);
+        List<Waypoint> privWaypoints = this.wpManager.getWaypoints(playerUuid, WaypointType.PRIVATE);
         player.sendMessage(ChatColor.RED + WaypointType.PRIVATE.text + " waypoints" + ChatColor.WHITE + ":");
         for (Waypoint wp : privWaypoints) {
             this.sendWaypointDetailMessage(wp, player);
@@ -122,8 +122,8 @@ public class WpCommand implements CommandExecutor {
 
         if (location != null) {
             player.setCompassTarget(location);
-            player.sendMessage(
-                    "Set compass to " + wpType + " waypoint '" + ChatColor.YELLOW + wpName + ChatColor.WHITE + "'");
+            player.sendMessage("Set compass to " + wpType.text + " waypoint '" + ChatColor.YELLOW + wpName
+                    + ChatColor.WHITE + "'");
         } else {
             player.sendMessage(this.plugin.getResponseMessage(ResponseMsgCfgPath.waypointNotExist));
         }
@@ -141,8 +141,8 @@ public class WpCommand implements CommandExecutor {
                 WaypointType.PRIVATE, prevLocation);
 
         if (location != null) {
-            player.sendMessage(
-                    "Teleporting to " + wpType + " waypoint '" + ChatColor.YELLOW + wpName + ChatColor.WHITE + "'");
+            player.sendMessage("Teleporting to " + wpType.text + " waypoint '" + ChatColor.YELLOW + wpName
+                    + ChatColor.WHITE + "'");
             player.teleport(location);
 
             this.wpManager.addWaypoint(prevWaypoint);

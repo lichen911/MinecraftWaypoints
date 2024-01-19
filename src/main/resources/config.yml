@@ -9,7 +9,7 @@ clickableChat:
   # If true the clicks will run the commands immediately, if false it will
   # put command suggestions into the chat box. The "rm" command will always
   # use suggestions to prevent accidental removal of waypoints.
-  clicksRunCommands: false
+  clicksRunCommands: true
 
   # A limitation of Geyser plugin is that it doesn't support clickable chat.
   # The below option attemps to hide clickable chat options from these users

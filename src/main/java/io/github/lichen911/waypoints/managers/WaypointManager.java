@@ -67,7 +67,7 @@ public class WaypointManager {
         return waypoint;
     }
 
-    private List<Waypoint> getWaypointList(String configPrefix) {
+    private List<Waypoint> getWaypointList(String configPrefix, WaypointType wpType) {
         ConfigurationSection waypointConfigSection = this.wpConfig.getConfig().getConfigurationSection(configPrefix);
 
         List<Waypoint> waypoints = new ArrayList<Waypoint>();
@@ -78,19 +78,19 @@ public class WaypointManager {
                 String wpName = entry.getKey();
                 String wpLocPath = configPrefix + "." + wpName + "." + configLocPath;
                 Location wpLoc = this.wpConfig.getConfig().getLocation(wpLocPath);
-                Waypoint waypoint = new Waypoint(null, null, wpName, WaypointType.PUBLIC, wpLoc);
+                Waypoint waypoint = new Waypoint(null, null, wpName, wpType, wpLoc);
                 waypoints.add(waypoint);
             }
         }
         return waypoints;
     }
 
-    public List<Waypoint> getWaypoints() {
-        return this.getWaypointList(configPublicPrefix);
+    public List<Waypoint> getWaypoints(WaypointType wpType) {
+        return this.getWaypointList(configPublicPrefix, wpType);
     }
 
-    public List<Waypoint> getWaypoints(String playerUuid) {
+    public List<Waypoint> getWaypoints(String playerUuid, WaypointType wpType) {
         String configPlayerPath = configPlayersPrefix + "." + playerUuid;
-        return this.getWaypointList(configPlayerPath);
+        return this.getWaypointList(configPlayerPath, wpType);
     }
 }

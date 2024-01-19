@@ -28,7 +28,7 @@ public class ClickableChatManager {
         String fullCmd = wpCmdPrefix + " " + cmd + " " + wpName;
 
         if (wpType == WaypointType.PUBLIC) {
-            fullCmd += " " + WaypointType.PUBLIC.text;
+            fullCmd += " " + CommandLiteral.PUB;
         }
 
         return fullCmd;
