@@ -4,6 +4,7 @@ import org.bukkit.entity.Player;
 
 import io.github.lichen911.waypoints.Waypoints;
 import io.github.lichen911.waypoints.enums.WaypointType;
+import io.github.lichen911.waypoints.utils.ClickableChatCfgPath;
 import io.github.lichen911.waypoints.utils.CommandLiteral;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -24,6 +25,10 @@ public class ClickableChatManager {
         return this.plugin.getConfig().getBoolean(chatConfigPrefix + "." + setting);
     }
 
+    public String getClickableChatConfigStr(String setting) {
+        return this.plugin.getConfig().getString(chatConfigPrefix + "." + setting);
+    }
+
     private String buildCommand(String cmd, String wpName, WaypointType wpType) {
         String fullCmd = wpCmdPrefix + " " + cmd + " " + wpName;
 
@@ -32,6 +37,19 @@ public class ClickableChatManager {
         }
 
         return fullCmd;
+    }
+
+    public boolean isGeyserUser(Player player) {
+        String geyserPluginName = this.getClickableChatConfigStr(ClickableChatCfgPath.geyserPluginName);
+        String geyserUsernamePrefix = this.getClickableChatConfigStr(ClickableChatCfgPath.geyserUsernamePrefix);
+
+        if (this.plugin.getServer().getPluginManager().getPlugin(geyserPluginName) != null) {
+            String playerName = player.getPlayerListName();
+            if (playerName.startsWith(geyserUsernamePrefix)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public TextComponent getClickableCommands(Player player, String wpName, WaypointType wpType) {

@@ -57,7 +57,7 @@ public class WpCommand implements CommandExecutor {
         Location location = player.getLocation();
         Waypoint waypoint = new Waypoint(playerName, playerUuid, wpName, wpType, location);
 
-        player.sendMessage("Creating " + wpType + " waypoint named '" + ChatColor.YELLOW + wpName + ChatColor.WHITE
+        player.sendMessage("Creating " + wpType.text + " waypoint named '" + ChatColor.YELLOW + wpName + ChatColor.WHITE
                 + "' at " + ChatColor.YELLOW + waypoint.getCoordString());
 
         this.wpManager.addWaypoint(waypoint);
@@ -68,7 +68,7 @@ public class WpCommand implements CommandExecutor {
         Waypoint waypoint = wpManager.getWaypoint(playerUuid, wpName, wpType);
 
         player.sendMessage(
-                "Deleting " + wpType + " waypoint named '" + ChatColor.YELLOW + wpName + ChatColor.WHITE + "'");
+                "Deleting " + wpType.text + " waypoint named '" + ChatColor.YELLOW + wpName + ChatColor.WHITE + "'");
 
         this.wpManager.rmWaypoint(waypoint);
     }
@@ -88,11 +88,12 @@ public class WpCommand implements CommandExecutor {
                 .append(location.getWorld().getName()).color(ChatColor.YELLOW).append("]").color(ChatColor.WHITE);
 
         if (this.ccManager.getClickableChatConfig(ClickableChatCfgPath.useClickableChat)) {
-            // TODO: Add logic to test for Geyser users
+            if (!this.ccManager.isGeyserUser(player)) {
 
-            TextComponent ccMenuOpts = this.ccManager.getClickableCommands(player, wpName, wpType);
-            if (ccMenuOpts != null) {
-                component = component.append(" ").append(ccMenuOpts);
+                TextComponent ccMenuOpts = this.ccManager.getClickableCommands(player, wpName, wpType);
+                if (ccMenuOpts != null) {
+                    component = component.append(" ").append(ccMenuOpts);
+                }
             }
         }
 

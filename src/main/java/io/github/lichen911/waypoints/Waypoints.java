@@ -37,4 +37,5 @@ public final class Waypoints extends JavaPlugin {
     public String getResponseMessage(String msgName) {
         return this.getConfig().getString(configResponseMsgPrefix + "." + msgName);
     }
+
 }
