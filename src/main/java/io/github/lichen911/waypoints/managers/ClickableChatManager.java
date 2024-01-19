@@ -4,8 +4,8 @@ import org.bukkit.entity.Player;
 
 import io.github.lichen911.waypoints.Waypoints;
 import io.github.lichen911.waypoints.enums.WaypointType;
-import io.github.lichen911.waypoints.utils.ClickableChatCfgPath;
 import io.github.lichen911.waypoints.utils.CommandLiteral;
+import io.github.lichen911.waypoints.utils.ConfigPath;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -13,7 +13,6 @@ import net.md_5.bungee.api.chat.TextComponent;
 public class ClickableChatManager {
     private final Waypoints plugin;
     private final PermissionManager permManager;
-    private final String chatConfigPrefix = "clickableChat";
     private final String wpCmdPrefix = "/wp";
 
     public ClickableChatManager(Waypoints plugin, PermissionManager permManager) {
@@ -22,11 +21,11 @@ public class ClickableChatManager {
     }
 
     public boolean getClickableChatConfig(String setting) {
-        return this.plugin.getConfig().getBoolean(chatConfigPrefix + "." + setting);
+        return this.plugin.getConfig().getBoolean(setting);
     }
 
     public String getClickableChatConfigStr(String setting) {
-        return this.plugin.getConfig().getString(chatConfigPrefix + "." + setting);
+        return this.plugin.getConfig().getString(setting);
     }
 
     private String buildCommand(String cmd, String wpName, WaypointType wpType) {
@@ -40,8 +39,8 @@ public class ClickableChatManager {
     }
 
     public boolean isGeyserUser(Player player) {
-        String geyserPluginName = this.getClickableChatConfigStr(ClickableChatCfgPath.geyserPluginName);
-        String geyserUsernamePrefix = this.getClickableChatConfigStr(ClickableChatCfgPath.geyserUsernamePrefix);
+        String geyserPluginName = this.getClickableChatConfigStr(ConfigPath.geyserPluginName);
+        String geyserUsernamePrefix = this.getClickableChatConfigStr(ConfigPath.geyserUsernamePrefix);
 
         if (this.plugin.getServer().getPluginManager().getPlugin(geyserPluginName) != null) {
             String playerName = player.getPlayerListName();

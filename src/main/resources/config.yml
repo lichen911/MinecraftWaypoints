@@ -15,11 +15,11 @@ clickableChat:
   # The below option attemps to hide clickable chat options from these users
   # so it doesn't clutter their output, but they can still type the commands.
   hideGeyserUsers: true
-  geyserPluginName: "Geyser-Spigot"
-  geyserUsernamePrefix: "."
+  geyserPluginName: Geyser-Spigot
+  geyserUsernamePrefix: .
 
 # Following are some customizable responses for user input.
 responseMessages:
-  waypointNotExist: "Waypoint does not exist"
-  playerCmdOnly: "This command can only be run by a player."
-  noPermission: "Player does not have permission"
+  waypointNotExist: Waypoint does not exist
+  playerCmdOnly: This command can only be run by a player.
+  noPermission: Player does not have permission

@@ -14,9 +14,8 @@ import io.github.lichen911.waypoints.managers.ClickableChatManager;
 import io.github.lichen911.waypoints.managers.PermissionManager;
 import io.github.lichen911.waypoints.managers.WaypointManager;
 import io.github.lichen911.waypoints.objects.Waypoint;
-import io.github.lichen911.waypoints.utils.ClickableChatCfgPath;
 import io.github.lichen911.waypoints.utils.CommandLiteral;
-import io.github.lichen911.waypoints.utils.ResponseMsgCfgPath;
+import io.github.lichen911.waypoints.utils.ConfigPath;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -87,7 +86,7 @@ public class WpCommand implements CommandExecutor {
                 .color(ChatColor.WHITE).append(biome).color(ChatColor.YELLOW).append(", ").color(ChatColor.WHITE)
                 .append(location.getWorld().getName()).color(ChatColor.YELLOW).append("]").color(ChatColor.WHITE);
 
-        if (this.ccManager.getClickableChatConfig(ClickableChatCfgPath.useClickableChat)) {
+        if (this.ccManager.getClickableChatConfig(ConfigPath.useClickableChat)) {
             if (!this.ccManager.isGeyserUser(player)) {
 
                 TextComponent ccMenuOpts = this.ccManager.getClickableCommands(player, wpName, wpType);
@@ -126,7 +125,7 @@ public class WpCommand implements CommandExecutor {
             player.sendMessage("Set compass to " + wpType.text + " waypoint '" + ChatColor.YELLOW + wpName
                     + ChatColor.WHITE + "'");
         } else {
-            player.sendMessage(this.plugin.getResponseMessage(ResponseMsgCfgPath.waypointNotExist));
+            player.sendMessage(this.plugin.getResponseMessage(ConfigPath.waypointNotExist));
         }
 
     }
@@ -148,13 +147,13 @@ public class WpCommand implements CommandExecutor {
 
             this.wpManager.addWaypoint(prevWaypoint);
         } else {
-            player.sendMessage(this.plugin.getResponseMessage(ResponseMsgCfgPath.waypointNotExist));
+            player.sendMessage(this.plugin.getResponseMessage(ConfigPath.waypointNotExist));
         }
     }
 
     public boolean onCommand(CommandSender sender, Command command, String label, String[] split) {
         if (!(sender instanceof Player)) {
-            sender.sendMessage(this.plugin.getResponseMessage(ResponseMsgCfgPath.playerCmdOnly));
+            sender.sendMessage(this.plugin.getResponseMessage(ConfigPath.playerCmdOnly));
             return true;
         }
         Player player = (Player) sender;
@@ -165,8 +164,7 @@ public class WpCommand implements CommandExecutor {
                 if (this.permManager.checkHasPermission(player, cmd, null)) {
                     this.listWaypoint(player);
                 } else {
-                    player.sendMessage(
-                            ChatColor.YELLOW + this.plugin.getResponseMessage(ResponseMsgCfgPath.noPermission));
+                    player.sendMessage(ChatColor.YELLOW + this.plugin.getResponseMessage(ConfigPath.noPermission));
                 }
             } else {
                 this.printHelp(player);
@@ -186,7 +184,7 @@ public class WpCommand implements CommandExecutor {
             }
 
             if (!this.permManager.checkHasPermission(player, cmd, wpType)) {
-                player.sendMessage(ChatColor.YELLOW + this.plugin.getResponseMessage(ResponseMsgCfgPath.noPermission));
+                player.sendMessage(ChatColor.YELLOW + this.plugin.getResponseMessage(ConfigPath.noPermission));
             }
 
             if (cmd.equals(CommandLiteral.ADD)) {

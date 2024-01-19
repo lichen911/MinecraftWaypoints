@@ -16,13 +16,14 @@ public final class Waypoints extends JavaPlugin {
     private static PermissionManager permManager;
     private ClickableChatManager ccManager;
 
-    private final String configResponseMsgPrefix = "responseMessages";
-
     @Override
     public void onEnable() {
         Metrics metrics = new Metrics(this, 20727);
 
         this.saveDefaultConfig();
+        this.getConfig().options().copyDefaults(true);
+        this.getConfig().options().parseComments(true);
+        this.saveConfig();
 
         wpConfig = new ConfigReader(this, "", "waypoints.yml");
         wpConfig.saveDefaultConfig();
@@ -35,7 +36,7 @@ public final class Waypoints extends JavaPlugin {
     }
 
     public String getResponseMessage(String msgName) {
-        return this.getConfig().getString(configResponseMsgPrefix + "." + msgName);
+        return this.getConfig().getString(msgName);
     }
 
 }
