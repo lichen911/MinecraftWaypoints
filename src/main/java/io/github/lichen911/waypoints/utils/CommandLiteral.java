@@ -1,4 +1,4 @@
-package io.github.lichen911.waypoints.objects;
+package io.github.lichen911.waypoints.utils;
 
 public final class CommandLiteral {
     public static final String WP = "wp";

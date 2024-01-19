@@ -8,12 +8,13 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import io.github.lichen911.waypoints.NoPermissionException;
 import io.github.lichen911.waypoints.Waypoints;
 import io.github.lichen911.waypoints.enums.WaypointType;
+import io.github.lichen911.waypoints.managers.PermissionManager;
 import io.github.lichen911.waypoints.managers.WaypointManager;
-import io.github.lichen911.waypoints.objects.CommandLiteral;
 import io.github.lichen911.waypoints.objects.Waypoint;
+import io.github.lichen911.waypoints.utils.CommandLiteral;
+import io.github.lichen911.waypoints.utils.ResponseMsgPath;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -22,13 +23,15 @@ import net.md_5.bungee.api.chat.TextComponent;
 public class WpCommand implements CommandExecutor {
     private final Waypoints plugin;
     private final WaypointManager wpManager;
+    private final PermissionManager permManager;
 
     private final String lastWpName = "last";
     private final String chatConfigPrefix = "clickableChat";
 
-    public WpCommand(Waypoints plugin, WaypointManager wpManager) {
+    public WpCommand(Waypoints plugin, WaypointManager wpManager, PermissionManager permManager) {
         this.plugin = plugin;
         this.wpManager = wpManager;
+        this.permManager = permManager;
     }
 
     private void printHelp(Player player) {
@@ -125,7 +128,7 @@ public class WpCommand implements CommandExecutor {
             player.sendMessage(
                     "Set compass to " + wpType + " waypoint '" + ChatColor.YELLOW + wpName + ChatColor.WHITE + "'");
         } else {
-            player.sendMessage("Waypoint does not exist");
+            player.sendMessage(this.plugin.getResponseMessage(ResponseMsgPath.waypointNotExist));
         }
 
     }
@@ -147,79 +150,59 @@ public class WpCommand implements CommandExecutor {
 
             this.wpManager.addWaypoint(prevWaypoint);
         } else {
-            player.sendMessage("Waypoint does not exist");
+            player.sendMessage(this.plugin.getResponseMessage(ResponseMsgPath.waypointNotExist));
         }
-    }
-
-    public String getPermissionPath(String cmd, WaypointType wpType) {
-        String subCmd = cmd.toString().toLowerCase();
-
-        String permPath;
-        if (wpType != null) {
-            permPath = "waypoints." + wpType.text + "." + subCmd;
-        } else {
-            permPath = "waypoints." + subCmd;
-        }
-        return permPath;
-    }
-
-    public boolean checkHasPermission(Player player, String cmd, WaypointType wpType) throws NoPermissionException {
-        if (player.hasPermission(this.getPermissionPath(cmd, wpType))) {
-            return true;
-        }
-
-        throw new NoPermissionException();
     }
 
     public boolean onCommand(CommandSender sender, Command command, String label, String[] split) {
         if (!(sender instanceof Player)) {
-            sender.sendMessage("This command can only be run by a player.");
+            sender.sendMessage(this.plugin.getResponseMessage(ResponseMsgPath.playerCmdOnly));
             return true;
         }
         Player player = (Player) sender;
 
-        try {
-            if (split.length == 1) {
-                String cmd = split[0];
-                if (cmd.equals(CommandLiteral.LIST)) {
-                    this.checkHasPermission(player, cmd, null);
+        if (split.length == 1) {
+            String cmd = split[0];
+            if (cmd.equals(CommandLiteral.LIST)) {
+                if (this.permManager.checkHasPermission(player, cmd, null)) {
                     this.listWaypoint(player);
                 } else {
-                    this.printHelp(player);
-                }
-            } else if (split.length >= 2 && split.length <= 3) {
-                String cmd = split[0];
-                String wpName = split[1];
-                WaypointType wpType = WaypointType.PRIVATE;
-
-                if (split.length == 3) {
-                    if (!split[2].equals(CommandLiteral.PUB)) {
-                        this.printHelp(player);
-                        return true;
-                    } else {
-                        wpType = WaypointType.PUBLIC;
-                    }
-                }
-
-                this.checkHasPermission(player, cmd, wpType);
-                if (cmd.equals(CommandLiteral.ADD)) {
-                    this.addWaypoint(player, wpName, wpType);
-                } else if (cmd.equals(CommandLiteral.RM)) {
-                    this.rmWaypoint(player, wpName, wpType);
-                } else if (cmd.equals(CommandLiteral.SET)) {
-                    this.setWaypoint(player, wpName, wpType);
-                } else if (cmd.equals(CommandLiteral.TP)) {
-                    this.tpWaypoint(player, wpName, wpType);
-                } else {
-                    this.printHelp(player);
+                    player.sendMessage(ChatColor.YELLOW + this.plugin.getResponseMessage(ResponseMsgPath.noPermission));
                 }
             } else {
                 this.printHelp(player);
             }
-        } catch (
+        } else if (split.length >= 2 && split.length <= 3) {
+            String cmd = split[0];
+            String wpName = split[1];
+            WaypointType wpType = WaypointType.PRIVATE;
 
-        NoPermissionException ex) {
-            player.sendMessage(ChatColor.YELLOW + "Player does not have permission");
+            if (split.length == 3) {
+                if (!split[2].equals(CommandLiteral.PUB)) {
+                    this.printHelp(player);
+                    return true;
+                } else {
+                    wpType = WaypointType.PUBLIC;
+                }
+            }
+
+            if (!this.permManager.checkHasPermission(player, cmd, wpType)) {
+                player.sendMessage(ChatColor.YELLOW + this.plugin.getResponseMessage(ResponseMsgPath.noPermission));
+            }
+
+            if (cmd.equals(CommandLiteral.ADD)) {
+                this.addWaypoint(player, wpName, wpType);
+            } else if (cmd.equals(CommandLiteral.RM)) {
+                this.rmWaypoint(player, wpName, wpType);
+            } else if (cmd.equals(CommandLiteral.SET)) {
+                this.setWaypoint(player, wpName, wpType);
+            } else if (cmd.equals(CommandLiteral.TP)) {
+                this.tpWaypoint(player, wpName, wpType);
+            } else {
+                this.printHelp(player);
+            }
+        } else {
+            this.printHelp(player);
         }
 
         return true;
