@@ -4,6 +4,7 @@ import org.bstats.bukkit.Metrics;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import io.github.lichen911.waypoints.commands.WpCommand;
+import io.github.lichen911.waypoints.managers.ClickableChatManager;
 import io.github.lichen911.waypoints.managers.PermissionManager;
 import io.github.lichen911.waypoints.managers.WaypointManager;
 import io.github.lichen911.waypoints.utils.CommandLiteral;
@@ -13,6 +14,7 @@ public final class Waypoints extends JavaPlugin {
     private static ConfigReader wpConfig;
     private static WaypointManager wpManager;
     private static PermissionManager permManager;
+    private ClickableChatManager ccManager;
 
     private final String configResponseMsgPrefix = "responseMessages";
 
@@ -27,8 +29,9 @@ public final class Waypoints extends JavaPlugin {
 
         wpManager = new WaypointManager(wpConfig);
         permManager = new PermissionManager();
+        ccManager = new ClickableChatManager(this, permManager);
 
-        getCommand(CommandLiteral.WP).setExecutor(new WpCommand(this, wpManager, permManager));
+        getCommand(CommandLiteral.WP).setExecutor(new WpCommand(this, wpManager, permManager, ccManager));
     }
 
     public String getResponseMessage(String msgName) {

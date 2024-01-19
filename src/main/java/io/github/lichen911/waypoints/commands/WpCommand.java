@@ -10,11 +10,13 @@ import org.bukkit.entity.Player;
 
 import io.github.lichen911.waypoints.Waypoints;
 import io.github.lichen911.waypoints.enums.WaypointType;
+import io.github.lichen911.waypoints.managers.ClickableChatManager;
 import io.github.lichen911.waypoints.managers.PermissionManager;
 import io.github.lichen911.waypoints.managers.WaypointManager;
 import io.github.lichen911.waypoints.objects.Waypoint;
+import io.github.lichen911.waypoints.utils.ClickableChatCfgPath;
 import io.github.lichen911.waypoints.utils.CommandLiteral;
-import io.github.lichen911.waypoints.utils.ResponseMsgPath;
+import io.github.lichen911.waypoints.utils.ResponseMsgCfgPath;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -24,14 +26,16 @@ public class WpCommand implements CommandExecutor {
     private final Waypoints plugin;
     private final WaypointManager wpManager;
     private final PermissionManager permManager;
+    private final ClickableChatManager ccManager;
 
     private final String lastWpName = "last";
-    private final String chatConfigPrefix = "clickableChat";
 
-    public WpCommand(Waypoints plugin, WaypointManager wpManager, PermissionManager permManager) {
+    public WpCommand(Waypoints plugin, WaypointManager wpManager, PermissionManager permManager,
+            ClickableChatManager ccManager) {
         this.plugin = plugin;
         this.wpManager = wpManager;
         this.permManager = permManager;
+        this.ccManager = ccManager;
     }
 
     private void printHelp(Player player) {
@@ -44,10 +48,6 @@ public class WpCommand implements CommandExecutor {
         player.sendMessage(ChatColor.BLUE + "wp tp <name> [pub] " + ChatColor.WHITE + "- Teleport to a named waypoint");
         player.sendMessage(ChatColor.BLUE + "wp list " + ChatColor.WHITE
                 + "- Print a list of both public and the player's own private waypoints");
-    }
-
-    private boolean getClickableChatConfig(String setting) {
-        return this.plugin.getConfig().getBoolean(chatConfigPrefix + "." + setting);
     }
 
     private void addWaypoint(Player player, String wpName, WaypointType wpType) {
@@ -73,18 +73,11 @@ public class WpCommand implements CommandExecutor {
         this.wpManager.rmWaypoint(waypoint);
     }
 
-    private TextComponent addClickableCommands(Player player, String wpName, String wpType) {
-        boolean useRunCmd = this.getClickableChatConfig("clicksRunCommands");
-//        boolean hasSetPerm = this.checkHasPermission(player, wpName, wpType);
-
-        TextComponent msg = new TextComponent("(");
-        return msg;
-    }
-
     private void sendWaypointDetailMessage(Waypoint wp, Player player) {
         String wpName = wp.getName();
         Location location = wp.getLocation();
         String biome = wp.getBiome();
+        WaypointType wpType = wp.getWaypointType();
 
         ComponentBuilder component = new ComponentBuilder("  ").append(wpName).color(ChatColor.BLUE).append(" -> ")
                 .color(ChatColor.WHITE).append(Integer.toString(location.getBlockX())).color(ChatColor.YELLOW)
@@ -94,9 +87,13 @@ public class WpCommand implements CommandExecutor {
                 .color(ChatColor.WHITE).append(biome).color(ChatColor.YELLOW).append(", ").color(ChatColor.WHITE)
                 .append(location.getWorld().getName()).color(ChatColor.YELLOW).append("]").color(ChatColor.WHITE);
 
-        if (this.getClickableChatConfig("useClickableChat")) {
+        if (this.ccManager.getClickableChatConfig(ClickableChatCfgPath.useClickableChat)) {
             // TODO: Add logic to test for Geyser users
 
+            TextComponent ccMenuOpts = this.ccManager.getClickableCommands(player, wpName, wpType);
+            if (ccMenuOpts != null) {
+                component = component.append(" ").append(ccMenuOpts);
+            }
         }
 
         BaseComponent[] msg = component.create();
@@ -128,7 +125,7 @@ public class WpCommand implements CommandExecutor {
             player.sendMessage(
                     "Set compass to " + wpType + " waypoint '" + ChatColor.YELLOW + wpName + ChatColor.WHITE + "'");
         } else {
-            player.sendMessage(this.plugin.getResponseMessage(ResponseMsgPath.waypointNotExist));
+            player.sendMessage(this.plugin.getResponseMessage(ResponseMsgCfgPath.waypointNotExist));
         }
 
     }
@@ -150,13 +147,13 @@ public class WpCommand implements CommandExecutor {
 
             this.wpManager.addWaypoint(prevWaypoint);
         } else {
-            player.sendMessage(this.plugin.getResponseMessage(ResponseMsgPath.waypointNotExist));
+            player.sendMessage(this.plugin.getResponseMessage(ResponseMsgCfgPath.waypointNotExist));
         }
     }
 
     public boolean onCommand(CommandSender sender, Command command, String label, String[] split) {
         if (!(sender instanceof Player)) {
-            sender.sendMessage(this.plugin.getResponseMessage(ResponseMsgPath.playerCmdOnly));
+            sender.sendMessage(this.plugin.getResponseMessage(ResponseMsgCfgPath.playerCmdOnly));
             return true;
         }
         Player player = (Player) sender;
@@ -167,7 +164,8 @@ public class WpCommand implements CommandExecutor {
                 if (this.permManager.checkHasPermission(player, cmd, null)) {
                     this.listWaypoint(player);
                 } else {
-                    player.sendMessage(ChatColor.YELLOW + this.plugin.getResponseMessage(ResponseMsgPath.noPermission));
+                    player.sendMessage(
+                            ChatColor.YELLOW + this.plugin.getResponseMessage(ResponseMsgCfgPath.noPermission));
                 }
             } else {
                 this.printHelp(player);
@@ -187,7 +185,7 @@ public class WpCommand implements CommandExecutor {
             }
 
             if (!this.permManager.checkHasPermission(player, cmd, wpType)) {
-                player.sendMessage(ChatColor.YELLOW + this.plugin.getResponseMessage(ResponseMsgPath.noPermission));
+                player.sendMessage(ChatColor.YELLOW + this.plugin.getResponseMessage(ResponseMsgCfgPath.noPermission));
             }
 
             if (cmd.equals(CommandLiteral.ADD)) {
