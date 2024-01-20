@@ -1,4 +1,4 @@
-package io.github.lichen911.waypoints;
+package io.github.lichen911.waypoints.utils;
 
 public final class CommandLiteral {
     public static final String WP = "wp";
@@ -9,7 +9,4 @@ public final class CommandLiteral {
     public static final String PRIV = "priv";
     public static final String PUB = "pub";
     public static final String LIST = "list";
-
-    private CommandLiteral() {
-    }
 }
