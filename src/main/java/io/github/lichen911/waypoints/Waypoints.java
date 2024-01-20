@@ -58,5 +58,4 @@ public final class Waypoints extends JavaPlugin {
             }
         }
     }
-
 }
