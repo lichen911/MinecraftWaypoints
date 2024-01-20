@@ -12,4 +12,6 @@ public class ConfigPath {
     public static final String hideGeyserUsers = clickableChatPrefix + "." + "hideGeyserUsers";
     public static final String geyserPluginName = clickableChatPrefix + "." + "geyserPluginName";
     public static final String geyserUsernamePrefix = clickableChatPrefix + "." + "geyserUsernamePrefix";
+
+    public static final String checkForUpdates = "checkForUpdates";
 }
