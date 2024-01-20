@@ -52,7 +52,7 @@ public class ClickableChatManager {
     }
 
     public TextComponent getClickableCommands(Player player, String wpName, WaypointType wpType) {
-        boolean useRunCmd = this.getClickableChatConfig("clicksRunCommands");
+        boolean useRunCmd = this.getClickableChatConfig(ConfigPath.clicksRunCommands);
         ClickEvent.Action clickEventAction;
         if (useRunCmd) {
             clickEventAction = ClickEvent.Action.RUN_COMMAND;

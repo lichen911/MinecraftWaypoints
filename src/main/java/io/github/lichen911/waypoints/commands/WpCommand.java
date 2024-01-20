@@ -47,6 +47,11 @@ public class WpCommand implements CommandExecutor {
         player.sendMessage(ChatColor.BLUE + "wp tp <name> [pub] " + ChatColor.WHITE + "- Teleport to a named waypoint");
         player.sendMessage(ChatColor.BLUE + "wp list " + ChatColor.WHITE
                 + "- Print a list of both public and the player's own private waypoints");
+
+        if (!this.ccManager.isGeyserUser(player)) {
+            player.sendMessage("You can also " + ChatColor.YELLOW + "click" + ChatColor.WHITE + " on the ("
+                    + ChatColor.GOLD + "set tp rm" + ChatColor.WHITE + ") commands in " + ChatColor.BLUE + "wp list");
+        }
     }
 
     private void addWaypoint(Player player, String wpName, WaypointType wpType) {
@@ -78,23 +83,25 @@ public class WpCommand implements CommandExecutor {
         String biome = wp.getBiome();
         WaypointType wpType = wp.getWaypointType();
 
-        ComponentBuilder component = new ComponentBuilder("  ").append(wpName).color(ChatColor.BLUE).append(" -> ")
-                .color(ChatColor.WHITE).append(Integer.toString(location.getBlockX())).color(ChatColor.YELLOW)
-                .append(", ").color(ChatColor.WHITE).append(Integer.toString(location.getBlockY()))
-                .color(ChatColor.YELLOW).append(", ").color(ChatColor.WHITE)
-                .append(Integer.toString(location.getBlockZ())).color(ChatColor.YELLOW).append(" [")
-                .color(ChatColor.WHITE).append(biome).color(ChatColor.YELLOW).append(", ").color(ChatColor.WHITE)
-                .append(location.getWorld().getName()).color(ChatColor.YELLOW).append("]").color(ChatColor.WHITE);
+        ComponentBuilder component = new ComponentBuilder(" ");
 
         if (this.ccManager.getClickableChatConfig(ConfigPath.useClickableChat)) {
             if (!this.ccManager.isGeyserUser(player)) {
 
                 TextComponent ccMenuOpts = this.ccManager.getClickableCommands(player, wpName, wpType);
                 if (ccMenuOpts != null) {
-                    component = component.append(" ").append(ccMenuOpts);
+                    component = component.append(ccMenuOpts).append(" ");
                 }
             }
         }
+
+        component = component.append(wpName).color(ChatColor.BLUE).append(" -> ").color(ChatColor.WHITE)
+                .append(Integer.toString(location.getBlockX())).color(ChatColor.YELLOW).append(", ")
+                .color(ChatColor.WHITE).append(Integer.toString(location.getBlockY())).color(ChatColor.YELLOW)
+                .append(", ").color(ChatColor.WHITE).append(Integer.toString(location.getBlockZ()))
+                .color(ChatColor.YELLOW).append(" [").color(ChatColor.WHITE).append(biome).color(ChatColor.YELLOW)
+                .append(", ").color(ChatColor.WHITE).append(location.getWorld().getName()).color(ChatColor.YELLOW)
+                .append("]").color(ChatColor.WHITE);
 
         BaseComponent[] msg = component.create();
         player.spigot().sendMessage(msg);
@@ -185,6 +192,7 @@ public class WpCommand implements CommandExecutor {
 
             if (!this.permManager.checkHasPermission(player, cmd, wpType)) {
                 player.sendMessage(ChatColor.YELLOW + this.plugin.getResponseMessage(ConfigPath.noPermission));
+                return true;
             }
 
             if (cmd.equals(CommandLiteral.ADD)) {
