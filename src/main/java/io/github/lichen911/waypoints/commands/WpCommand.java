@@ -110,13 +110,13 @@ public class WpCommand implements CommandExecutor {
     private void listWaypoint(Player player) {
         String playerUuid = player.getUniqueId().toString();
 
-        List<Waypoint> pubWaypoints = this.wpManager.getWaypoints(WaypointType.PUBLIC);
+        List<Waypoint> pubWaypoints = this.wpManager.getPublicWaypoints();
         player.sendMessage(ChatColor.RED + WaypointType.PUBLIC.text + " waypoints" + ChatColor.WHITE + ":");
         for (Waypoint wp : pubWaypoints) {
             this.sendWaypointDetailMessage(wp, player);
         }
 
-        List<Waypoint> privWaypoints = this.wpManager.getWaypoints(playerUuid, WaypointType.PRIVATE);
+        List<Waypoint> privWaypoints = this.wpManager.getPrivateWaypoints(playerUuid);
         player.sendMessage(ChatColor.RED + WaypointType.PRIVATE.text + " waypoints" + ChatColor.WHITE + ":");
         for (Waypoint wp : privWaypoints) {
             this.sendWaypointDetailMessage(wp, player);

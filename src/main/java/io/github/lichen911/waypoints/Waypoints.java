@@ -4,6 +4,7 @@ import org.bstats.bukkit.Metrics;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import io.github.lichen911.waypoints.commands.WpCommand;
+import io.github.lichen911.waypoints.commands.WpTabCompleter;
 import io.github.lichen911.waypoints.managers.ClickableChatManager;
 import io.github.lichen911.waypoints.managers.PermissionManager;
 import io.github.lichen911.waypoints.managers.WaypointManager;
@@ -40,6 +41,7 @@ public final class Waypoints extends JavaPlugin {
         ccManager = new ClickableChatManager(this, permManager);
 
         getCommand(CommandLiteral.WP).setExecutor(new WpCommand(this, wpManager, permManager, ccManager));
+        getCommand(CommandLiteral.WP).setTabCompleter(new WpTabCompleter(wpManager));
     }
 
     public String getResponseMessage(String msgName) {

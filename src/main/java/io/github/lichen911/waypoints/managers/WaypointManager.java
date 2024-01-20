@@ -85,12 +85,12 @@ public class WaypointManager {
         return waypoints;
     }
 
-    public List<Waypoint> getWaypoints(WaypointType wpType) {
-        return this.getWaypointList(configPublicPrefix, wpType);
+    public List<Waypoint> getPublicWaypoints() {
+        return this.getWaypointList(configPublicPrefix, WaypointType.PUBLIC);
     }
 
-    public List<Waypoint> getWaypoints(String playerUuid, WaypointType wpType) {
+    public List<Waypoint> getPrivateWaypoints(String playerUuid) {
         String configPlayerPath = configPlayersPrefix + "." + playerUuid;
-        return this.getWaypointList(configPlayerPath, wpType);
+        return this.getWaypointList(configPlayerPath, WaypointType.PRIVATE);
     }
 }
