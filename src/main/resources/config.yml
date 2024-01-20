@@ -23,3 +23,8 @@ responseMessages:
   waypointNotExist: Waypoint does not exist
   playerCmdOnly: This command can only be run by a player.
   noPermission: Player does not have permission
+
+# The following is used enable / disable the automtic update checker.
+# This does not download updates, it only makes a call to the Spigot API
+# to see if a new version is available. It's only done once during plugin load.
+checkForUpdates: true
