@@ -6,6 +6,7 @@
         <img alt="Build Status" src="https://github.com/lichen911/MinecraftWaypoints/actions/workflows/build_deploy.yml/badge.svg" />
     </a>
 </p>
+
 ### Waypoints Plugin
 ---
 Check out the SpigotMC resources page for the most up to date detail on this plugin - [https://www.spigotmc.org/resources/waypoints.114447/](https://www.spigotmc.org/resources/waypoints.114447/)
