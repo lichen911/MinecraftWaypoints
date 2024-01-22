@@ -1,7 +1,6 @@
 <p align="center">
-    <hr />
-        <img alt="Waypoints logo" src="https://lichen911.github.io/waypoints_icon_resized.png"/>
-    <hr />
+    <img alt="Waypoints logo" src="https://lichen911.github.io/waypoints_icon_resized.png"/>
+    <br>
     <a href="https://github.com/MockBukkit/MockBukkit/actions/">
         <img alt="Build Status" src="https://github.com/lichen911/MinecraftWaypoints/actions/workflows/build_deploy.yml/badge.svg" />
     </a>
