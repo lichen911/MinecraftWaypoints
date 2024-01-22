@@ -1,3 +1,11 @@
+<p align="center">
+    <hr />
+        <img alt="Waypoints logo" src="https://lichen911.github.io/waypoints_icon_resized.png"/>
+    <hr />
+    <a href="https://github.com/MockBukkit/MockBukkit/actions/">
+        <img alt="Build Status" src="https://github.com/lichen911/MinecraftWaypoints/actions/workflows/build_deploy.yml/badge.svg" />
+    </a>
+</p>
 ### Waypoints Plugin
 ---
 Check out the SpigotMC resources page for the most up to date detail on this plugin - [https://www.spigotmc.org/resources/waypoints.114447/](https://www.spigotmc.org/resources/waypoints.114447/)
