@@ -52,9 +52,14 @@ public final class Waypoints extends JavaPlugin {
         if (this.getConfig().getBoolean(ConfigPath.checkForUpdates)) {
             UpdateChecker updater = new UpdateChecker(this, spigotResourceId);
             try {
-                if (updater.checkForUpdates())
+                int updateResult = updater.checkForUpdates();
+                if (updateResult < 0) {
                     getLogger().warning("An update was found! New version: " + updater.getLatestVersion()
                             + ", download: " + updater.getResourceURL());
+                } else if (updateResult > 0) {
+                    getLogger().info("Current version appears to be newer than the latest official release version ("
+                            + updater.getLatestVersion() + ")");
+                }
             } catch (Exception e) {
                 getLogger().warning("Error while checking for updates: " + e.getMessage());
             }
