@@ -5,7 +5,7 @@
 
 	<groupId>io.github.lichen911</groupId>
 	<artifactId>Waypoints</artifactId>
-	<version>1.13.0</version>
+	<version>1.14.0</version>
 
 	<build>
 		<plugins>
@@ -27,7 +27,7 @@
 					<relocations>
 						<relocation>
 							<pattern>org.bstats</pattern>
-							<shadedPattern>me.name.util</shadedPattern>
+							<shadedPattern>io.github.lichen911.waypoints.bstats</shadedPattern>
 						</relocation>
 					</relocations>
 				</configuration>
@@ -41,6 +41,13 @@
 				</executions>
 			</plugin>
 		</plugins>
+
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
 	</build>
 
 	<repositories>
@@ -54,7 +61,7 @@
 		<dependency>
 			<groupId>org.spigotmc</groupId>
 			<artifactId>spigot-api</artifactId>
-			<version>1.20.4-R0.1-SNAPSHOT</version><!--change this value depending on the version or use LATEST-->
+			<version>1.20.4-R0.1-SNAPSHOT</version>
 			<type>jar</type>
 			<scope>provided</scope>
 		</dependency>
@@ -64,6 +71,12 @@
 			<artifactId>bstats-bukkit</artifactId>
 			<version>3.0.2</version>
 			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.maven</groupId>
+			<artifactId>maven-artifact</artifactId>
+			<version>3.6.3</version>
 		</dependency>
 	</dependencies>
 </project>

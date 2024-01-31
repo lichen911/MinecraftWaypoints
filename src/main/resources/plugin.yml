@@ -1,6 +1,6 @@
-name: Waypoints
-main: io.github.lichen911.waypoints.Waypoints
-version: 1.13.0
+name: ${project.name}
+main: ${project.groupId}.waypoints.Waypoints
+version: ${project.version}
 api-version: 1.20
 commands:
   wp:
