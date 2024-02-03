@@ -18,6 +18,7 @@ public class WaypointManager {
     private final String configPlayersPrefix = "waypoints.players";
     private final String configLocPath = "loc";
     private final String configUserPath = "userName";
+    private final String configPublicOwnerPath = "owner";
 
     public WaypointManager(ConfigReader wpConfig) {
         this.wpConfig = wpConfig;
@@ -47,6 +48,12 @@ public class WaypointManager {
 
         this.wpConfig.getConfig().set(configPath + "." + configLocPath, location);
         this.wpConfig.getConfig().set(configPath + "." + configUserPath, playerName);
+
+        // Store the owner's UUID for public waypoints
+        if (wp.getWaypointType() == WaypointType.PUBLIC) {
+            this.wpConfig.getConfig().set(configPath + "." + configPublicOwnerPath, wp.getPlayerUuid());
+        }
+
         this.wpConfig.saveConfig();
     }
 
@@ -62,6 +69,12 @@ public class WaypointManager {
         String configPath = this.getWpConfigPath(playerUuid, wpName, wpType);
         String playerName = this.wpConfig.getConfig().getString(configPath + "." + configUserPath);
         Location location = this.getLocationFromConfig(playerUuid, wpName, wpType);
+
+        // In the case of a public waypoint the returned Waypoint object should have the
+        // playerUuid of the owner of the waypoint
+        if (wpType == WaypointType.PUBLIC) {
+            playerUuid = this.wpConfig.getConfig().getString(configPath + "." + configPublicOwnerPath);
+        }
 
         Waypoint waypoint = new Waypoint(playerName, playerUuid, wpName, wpType, location);
         return waypoint;

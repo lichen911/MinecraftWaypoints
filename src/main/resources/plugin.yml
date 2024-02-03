@@ -22,6 +22,9 @@ permissions:
   waypoints.private.set:
     description: Allows users to set their compass heading to a waypoint on their private
     default: true
+  waypoints.private.limit:
+  	description: Determines how many private waypoints are alllowed
+  	default: 10
   waypoints.public.set:
     description: Allows users to set their compass heading to a waypoint on the public list
     default: true

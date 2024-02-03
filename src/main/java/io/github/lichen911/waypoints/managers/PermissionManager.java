@@ -1,11 +1,14 @@
 package io.github.lichen911.waypoints.managers;
 
 import org.bukkit.entity.Player;
+import org.bukkit.permissions.PermissionAttachmentInfo;
 
 import io.github.lichen911.waypoints.enums.WaypointType;
 
 public class PermissionManager {
     private final String permissionPathPrefix = "waypoints";
+    private final String adminPermission = "admin";
+    private final String limitPermission = "limit";
 
     public String getPermissionPath(String cmd, WaypointType wpType) {
         String subCmd = cmd.toString().toLowerCase();
@@ -24,5 +27,25 @@ public class PermissionManager {
             return true;
         }
         return false;
+    }
+
+    public boolean isAdmin(Player player) {
+        if (player.hasPermission(permissionPathPrefix + "." + adminPermission)) {
+            return true;
+        }
+        return false;
+    }
+
+    public int getWaypointLimit(Player player, WaypointType wpType, int defaultValue) {
+        String permPath = permissionPathPrefix + "." + wpType.text + "." + limitPermission + ".";
+
+        for (PermissionAttachmentInfo attachmentInfo : player.getEffectivePermissions()) {
+            String permission = attachmentInfo.getPermission();
+            if (permission.startsWith(permPath)) {
+                return Integer.parseInt(permission.substring(permission.lastIndexOf(".") + 1));
+            }
+        }
+
+        return defaultValue;
     }
 }

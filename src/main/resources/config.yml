@@ -23,8 +23,16 @@ responseMessages:
   waypointNotExist: Waypoint does not exist
   playerCmdOnly: This command can only be run by a player.
   noPermission: Player does not have permission
+  waypointLimitExceeded: Waypoint limit exceeded
 
 # The following is used to enable / disable the automatic update checker.
 # This does not download updates, it only makes a call to the Spigot API
 # to see if a new version is available. It's only done once during plugin load.
 checkForUpdates: true
+
+# Waypoints maintains a per-user count of both public and private waypoints. The
+# following setting defines how many public / private waypoints are allowed per user.
+# These are the values that are used unless a per-user limit is defined with permissions.
+# Use a large value to effectively disable default limits.
+defaultPublicWaypointLimit: 20
+defaultPrivateWaypointLimit: 20

@@ -54,6 +54,28 @@ public class WpCommand implements CommandExecutor {
         }
     }
 
+    private boolean checkWaypointLimit(Player player, WaypointType wpType) {
+        int defaultPubWpLimit = this.plugin.getConfig().getInt(ConfigPath.defaultPublicWaypointLimit);
+        int defaultPrivWpLimit = this.plugin.getConfig().getInt(ConfigPath.defaultPrivateWaypointLimit);
+
+        int wpLimit;
+        int currentWpCount;
+
+        if (wpType == WaypointType.PUBLIC) {
+            wpLimit = this.permManager.getWaypointLimit(player, wpType, defaultPubWpLimit);
+            currentWpCount = this.wpManager.getPublicWaypoints().size();
+        } else {
+            wpLimit = this.permManager.getWaypointLimit(player, wpType, defaultPrivWpLimit);
+            currentWpCount = this.wpManager.getPrivateWaypoints(player.getUniqueId().toString()).size();
+        }
+
+        if (currentWpCount < wpLimit) {
+            return true;
+        }
+
+        return false;
+    }
+
     private void addWaypoint(Player player, String wpName, WaypointType wpType) {
         String playerUuid = player.getUniqueId().toString();
         String playerName = player.getPlayerListName();
@@ -61,15 +83,29 @@ public class WpCommand implements CommandExecutor {
         Location location = player.getLocation();
         Waypoint waypoint = new Waypoint(playerName, playerUuid, wpName, wpType, location);
 
-        player.sendMessage("Creating " + wpType.text + " waypoint named '" + ChatColor.YELLOW + wpName + ChatColor.WHITE
-                + "' at " + ChatColor.YELLOW + waypoint.getCoordString());
+        if (this.checkWaypointLimit(player, wpType)) {
+            player.sendMessage("Creating " + wpType.text + " waypoint named '" + ChatColor.YELLOW + wpName
+                    + ChatColor.WHITE + "' at " + ChatColor.YELLOW + waypoint.getCoordString());
 
-        this.wpManager.addWaypoint(waypoint);
+            this.wpManager.addWaypoint(waypoint);
+        } else {
+            this.sendNoPermissionMsg(player);
+        }
     }
 
     private void rmWaypoint(Player player, String wpName, WaypointType wpType) {
         String playerUuid = player.getUniqueId().toString();
         Waypoint waypoint = wpManager.getWaypoint(playerUuid, wpName, wpType);
+
+        if (wpType == WaypointType.PUBLIC) {
+            // If the waypoint does not have an owner or the player is not the owner then
+            // they must have the admin permission to delete it.
+            if ((waypoint.getPlayerUuid() == null || playerUuid != waypoint.getPlayerUuid())
+                    && !this.permManager.isAdmin(player)) {
+                this.sendNoPermissionMsg(player);
+                return;
+            }
+        }
 
         player.sendMessage(
                 "Deleting " + wpType.text + " waypoint named '" + ChatColor.YELLOW + wpName + ChatColor.WHITE + "'");
@@ -158,6 +194,10 @@ public class WpCommand implements CommandExecutor {
         }
     }
 
+    public void sendNoPermissionMsg(Player player) {
+        player.sendMessage(ChatColor.YELLOW + this.plugin.getResponseMessage(ConfigPath.noPermission));
+    }
+
     public boolean onCommand(CommandSender sender, Command command, String label, String[] split) {
         if (!(sender instanceof Player)) {
             sender.sendMessage(this.plugin.getResponseMessage(ConfigPath.playerCmdOnly));
@@ -171,7 +211,7 @@ public class WpCommand implements CommandExecutor {
                 if (this.permManager.checkHasPermission(player, cmd, null)) {
                     this.listWaypoint(player);
                 } else {
-                    player.sendMessage(ChatColor.YELLOW + this.plugin.getResponseMessage(ConfigPath.noPermission));
+                    this.sendNoPermissionMsg(player);
                 }
             } else {
                 this.printHelp(player);
@@ -191,7 +231,7 @@ public class WpCommand implements CommandExecutor {
             }
 
             if (!this.permManager.checkHasPermission(player, cmd, wpType)) {
-                player.sendMessage(ChatColor.YELLOW + this.plugin.getResponseMessage(ConfigPath.noPermission));
+                this.sendNoPermissionMsg(player);
                 return true;
             }
 
