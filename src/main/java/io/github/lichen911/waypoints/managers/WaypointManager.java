@@ -76,8 +76,12 @@ public class WaypointManager {
             playerUuid = this.wpConfig.getConfig().getString(configPath + "." + configPublicOwnerPath);
         }
 
-        Waypoint waypoint = new Waypoint(playerName, playerUuid, wpName, wpType, location);
-        return waypoint;
+        if (location != null) {
+            Waypoint waypoint = new Waypoint(playerName, playerUuid, wpName, wpType, location);
+            return waypoint;
+        }
+
+        return null;
     }
 
     private List<Waypoint> getWaypointList(String configPrefix, WaypointType wpType, String playerUuid) {

@@ -25,6 +25,7 @@ responseMessages:
   noPermission: Player does not have permission
   waypointLimitExceeded: Waypoint limit exceeded
   exceededServerMax: Exceeded server maximum waypoint limit
+  waypointNotOwnedByPlayer: Waypoint is not owned by player
 
 # The following is used to enable / disable the automatic update checker.
 # This does not download updates, it only makes a call to the Spigot API

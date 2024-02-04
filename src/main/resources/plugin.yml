@@ -39,7 +39,7 @@ permissions:
   waypoints.list:
     description: Allows users to list waypoints
     default: true
-  waypoints.private.limit.*:
+  waypoints.private.limit.#:
     description: Set the max number of allowed private waypoints for a user
-  waypoints.public.limit.*:
+  waypoints.public.limit.#:
     description: Set the max number of allowed public waypoints for a user

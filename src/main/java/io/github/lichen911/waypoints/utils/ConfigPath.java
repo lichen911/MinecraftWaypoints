@@ -7,6 +7,7 @@ public class ConfigPath {
     public static final String noPermission = responseMessagesPrefix + "." + "noPermission";
     public static final String waypointLimitExceeded = responseMessagesPrefix + "." + "waypointLimitExceeded";
     public static final String exceededServerMax = responseMessagesPrefix + "." + "exceededServerMax";
+    public static final String waypointNotOwnedByPlayer = responseMessagesPrefix + "." + "waypointNotOwnedByPlayer";
 
     public static final String clickableChatPrefix = "clickableChat";
     public static final String useClickableChat = clickableChatPrefix + "." + "useClickableChat";
