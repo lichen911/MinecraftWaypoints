@@ -30,7 +30,7 @@ public class PermissionManager {
     }
 
     public boolean isAdmin(Player player) {
-        if (player.hasPermission(permissionPathPrefix + "." + adminPermission)) {
+        if (player.hasPermission(permissionPathPrefix + "." + adminPermission) || player.isOp()) {
             return true;
         }
         return false;
@@ -41,7 +41,11 @@ public class PermissionManager {
 
         for (PermissionAttachmentInfo attachmentInfo : player.getEffectivePermissions()) {
             String permission = attachmentInfo.getPermission();
-            if (permission.startsWith(permPath)) {
+
+            // With the way we iterate over effect permissions and return at the first
+            // matching instance, we will have unexpected results if multiple permissions
+            // define a limit.
+            if (permission.startsWith(permPath) && attachmentInfo.getValue()) {
                 return Integer.parseInt(permission.substring(permission.lastIndexOf(".") + 1));
             }
         }

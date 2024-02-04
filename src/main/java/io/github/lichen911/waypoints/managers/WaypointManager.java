@@ -80,7 +80,7 @@ public class WaypointManager {
         return waypoint;
     }
 
-    private List<Waypoint> getWaypointList(String configPrefix, WaypointType wpType) {
+    private List<Waypoint> getWaypointList(String configPrefix, WaypointType wpType, String playerUuid) {
         ConfigurationSection waypointConfigSection = this.wpConfig.getConfig().getConfigurationSection(configPrefix);
 
         List<Waypoint> waypoints = new ArrayList<Waypoint>();
@@ -89,21 +89,38 @@ public class WaypointManager {
 
             for (Map.Entry<String, Object> entry : waypointMap.entrySet()) {
                 String wpName = entry.getKey();
-                String wpLocPath = configPrefix + "." + wpName + "." + configLocPath;
+                String configPrefixWpName = configPrefix + "." + wpName;
+                String wpLocPath = configPrefixWpName + "." + configLocPath;
+                String wpUserName = this.wpConfig.getConfig().getString(configPrefixWpName + "." + configUserPath);
+                String wpOwnerUuid;
                 Location wpLoc = this.wpConfig.getConfig().getLocation(wpLocPath);
-                Waypoint waypoint = new Waypoint(null, null, wpName, wpType, wpLoc);
-                waypoints.add(waypoint);
+
+                if (wpType == WaypointType.PUBLIC) {
+                    wpOwnerUuid = this.wpConfig.getConfig().getString(configPrefixWpName + "." + configPublicOwnerPath);
+                } else {
+                    wpOwnerUuid = playerUuid;
+                }
+
+                Waypoint waypoint = new Waypoint(wpUserName, wpOwnerUuid, wpName, wpType, wpLoc);
+
+                if (playerUuid == null || playerUuid.equals(waypoint.getPlayerUuid())) {
+                    waypoints.add(waypoint);
+                }
             }
         }
         return waypoints;
     }
 
     public List<Waypoint> getPublicWaypoints() {
-        return this.getWaypointList(configPublicPrefix, WaypointType.PUBLIC);
+        return this.getWaypointList(configPublicPrefix, WaypointType.PUBLIC, null);
+    }
+
+    public List<Waypoint> getPublicWaypointsByOwner(String playerUuid) {
+        return this.getWaypointList(configPublicPrefix, WaypointType.PUBLIC, playerUuid);
     }
 
     public List<Waypoint> getPrivateWaypoints(String playerUuid) {
         String configPlayerPath = configPlayersPrefix + "." + playerUuid;
-        return this.getWaypointList(configPlayerPath, WaypointType.PRIVATE);
+        return this.getWaypointList(configPlayerPath, WaypointType.PRIVATE, null);
     }
 }

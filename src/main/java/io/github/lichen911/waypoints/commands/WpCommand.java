@@ -60,17 +60,21 @@ public class WpCommand implements CommandExecutor {
 
         int wpLimit;
         int currentWpCount;
+        String playerUuid = player.getUniqueId().toString();
 
         if (wpType == WaypointType.PUBLIC) {
             wpLimit = this.permManager.getWaypointLimit(player, wpType, defaultPubWpLimit);
-            currentWpCount = this.wpManager.getPublicWaypoints().size();
+            currentWpCount = this.wpManager.getPublicWaypointsByOwner(playerUuid).size();
         } else {
             wpLimit = this.permManager.getWaypointLimit(player, wpType, defaultPrivWpLimit);
-            currentWpCount = this.wpManager.getPrivateWaypoints(player.getUniqueId().toString()).size();
+            currentWpCount = this.wpManager.getPrivateWaypoints(playerUuid).size();
         }
 
-        if (currentWpCount < wpLimit) {
+        if (currentWpCount < wpLimit || this.permManager.isAdmin(player)) {
             return true;
+        } else {
+            player.sendMessage(ChatColor.YELLOW + this.plugin.getResponseMessage(ConfigPath.waypointLimitExceeded)
+                    + ChatColor.WHITE + " (" + ChatColor.YELLOW + wpLimit + ChatColor.WHITE + ")");
         }
 
         return false;
@@ -88,8 +92,6 @@ public class WpCommand implements CommandExecutor {
                     + ChatColor.WHITE + "' at " + ChatColor.YELLOW + waypoint.getCoordString());
 
             this.wpManager.addWaypoint(waypoint);
-        } else {
-            this.sendNoPermissionMsg(player);
         }
     }
 
@@ -100,7 +102,7 @@ public class WpCommand implements CommandExecutor {
         if (wpType == WaypointType.PUBLIC) {
             // If the waypoint does not have an owner or the player is not the owner then
             // they must have the admin permission to delete it.
-            if ((waypoint.getPlayerUuid() == null || playerUuid != waypoint.getPlayerUuid())
+            if ((waypoint.getPlayerUuid() == null || !playerUuid.equals(waypoint.getPlayerUuid()))
                     && !this.permManager.isAdmin(player)) {
                 this.sendNoPermissionMsg(player);
                 return;
