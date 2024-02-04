@@ -41,4 +41,7 @@ defaultPrivateWaypointLimit: 20
 # The maximum total number of all public waypoints on the server. Even if a user is under
 # their per-user limit they will not be able to add waypoints if the total count meets or exceeds
 # this limit, unless they have admin permission or is an op.
-serverMaxPublicWaypointLimit: 10
+serverMaxPublicWaypointLimit: 20
+
+# Should the output of "wp list" be sorted by waypoint name?
+sortWaypointList: true

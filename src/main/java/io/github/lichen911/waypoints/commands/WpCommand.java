@@ -1,5 +1,6 @@
 package io.github.lichen911.waypoints.commands;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.bukkit.Location;
@@ -165,12 +166,18 @@ public class WpCommand implements CommandExecutor {
         String playerUuid = player.getUniqueId().toString();
 
         List<Waypoint> pubWaypoints = this.wpManager.getPublicWaypoints();
+        List<Waypoint> privWaypoints = this.wpManager.getPrivateWaypoints(playerUuid);
+
+        if (this.plugin.getConfig().getBoolean(ConfigPath.sortWaypointList)) {
+            Collections.sort(pubWaypoints, Waypoint.COMPARE_BY_NAME);
+            Collections.sort(privWaypoints, Waypoint.COMPARE_BY_NAME);
+        }
+
         player.sendMessage(ChatColor.RED + WaypointType.PUBLIC.text + " waypoints" + ChatColor.WHITE + ":");
         for (Waypoint wp : pubWaypoints) {
             this.sendWaypointDetailMessage(wp, player, listNames);
         }
 
-        List<Waypoint> privWaypoints = this.wpManager.getPrivateWaypoints(playerUuid);
         player.sendMessage(ChatColor.RED + WaypointType.PRIVATE.text + " waypoints" + ChatColor.WHITE + ":");
         for (Waypoint wp : privWaypoints) {
             this.sendWaypointDetailMessage(wp, player, false);

@@ -20,4 +20,6 @@ public class ConfigPath {
     public static final String defaultPublicWaypointLimit = "defaultPublicWaypointLimit";
     public static final String defaultPrivateWaypointLimit = "defaultPrivateWaypointLimit";
     public static final String serverMaxPublicWaypointLimit = "serverMaxPublicWaypointLimit";
+
+    public static final String sortWaypointList = "sortWaypointList";
 }
