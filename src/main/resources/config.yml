@@ -24,6 +24,7 @@ responseMessages:
   playerCmdOnly: This command can only be run by a player.
   noPermission: Player does not have permission
   waypointLimitExceeded: Waypoint limit exceeded
+  exceededServerMax: Exceeded server maximum waypoint limit
 
 # The following is used to enable / disable the automatic update checker.
 # This does not download updates, it only makes a call to the Spigot API
@@ -34,5 +35,10 @@ checkForUpdates: true
 # following setting defines how many public / private waypoints are allowed per user.
 # These are the values that are used unless a per-user limit is defined with permissions.
 # Use a large value to effectively disable default limits.
-defaultPublicWaypointLimit: 20
+defaultPublicWaypointLimit: 5
 defaultPrivateWaypointLimit: 20
+
+# The maximum total number of all public waypoints on the server. Even if a user is under
+# their per-user limit they will not be able to add waypoints if the total count meets or exceeds
+# this limit, unless they have admin permission or is an op.
+serverMaxPublicWaypointLimit: 10

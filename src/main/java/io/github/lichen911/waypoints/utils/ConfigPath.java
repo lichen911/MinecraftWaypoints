@@ -6,6 +6,7 @@ public class ConfigPath {
     public static final String playerCmdOnly = responseMessagesPrefix + "." + "playerCmdOnly";
     public static final String noPermission = responseMessagesPrefix + "." + "noPermission";
     public static final String waypointLimitExceeded = responseMessagesPrefix + "." + "waypointLimitExceeded";
+    public static final String exceededServerMax = responseMessagesPrefix + "." + "exceededServerMax";
 
     public static final String clickableChatPrefix = "clickableChat";
     public static final String useClickableChat = clickableChatPrefix + "." + "useClickableChat";
@@ -15,7 +16,8 @@ public class ConfigPath {
     public static final String geyserUsernamePrefix = clickableChatPrefix + "." + "geyserUsernamePrefix";
 
     public static final String checkForUpdates = "checkForUpdates";
-    
+
     public static final String defaultPublicWaypointLimit = "defaultPublicWaypointLimit";
     public static final String defaultPrivateWaypointLimit = "defaultPrivateWaypointLimit";
+    public static final String serverMaxPublicWaypointLimit = "serverMaxPublicWaypointLimit";
 }

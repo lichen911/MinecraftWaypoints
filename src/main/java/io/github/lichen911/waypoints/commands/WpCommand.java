@@ -65,6 +65,15 @@ public class WpCommand implements CommandExecutor {
         if (wpType == WaypointType.PUBLIC) {
             wpLimit = this.permManager.getWaypointLimit(player, wpType, defaultPubWpLimit);
             currentWpCount = this.wpManager.getPublicWaypointsByOwner(playerUuid).size();
+
+            // Check to ensure we stay under the configured server max waypoint limit
+            int totalPublicWaypoints = this.wpManager.getPublicWaypoints().size();
+            int maxPubWpLimit = this.plugin.getConfig().getInt(ConfigPath.serverMaxPublicWaypointLimit);
+            if (totalPublicWaypoints >= maxPubWpLimit && !this.permManager.isAdmin(player)) {
+                player.sendMessage(ChatColor.YELLOW + this.plugin.getResponseMessage(ConfigPath.exceededServerMax)
+                        + ChatColor.WHITE + " (" + ChatColor.YELLOW + maxPubWpLimit + ChatColor.WHITE + ")");
+                return false;
+            }
         } else {
             wpLimit = this.permManager.getWaypointLimit(player, wpType, defaultPrivWpLimit);
             currentWpCount = this.wpManager.getPrivateWaypoints(playerUuid).size();
