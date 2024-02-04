@@ -47,6 +47,8 @@ public class WpCommand implements CommandExecutor {
         player.sendMessage(ChatColor.BLUE + "wp tp <name> [pub] " + ChatColor.WHITE + "- Teleport to a named waypoint");
         player.sendMessage(ChatColor.BLUE + "wp list " + ChatColor.WHITE
                 + "- Print a list of both public and the player's own private waypoints");
+        player.sendMessage(ChatColor.BLUE + "wp listnames " + ChatColor.WHITE + "- Same as " + ChatColor.BLUE
+                + "wp list" + ChatColor.WHITE + " with public waypoint owner names");
 
         if (!this.ccManager.isGeyserUser(player)) {
             player.sendMessage("You can also " + ChatColor.YELLOW + "click" + ChatColor.WHITE + " on the ("
@@ -69,6 +71,7 @@ public class WpCommand implements CommandExecutor {
             // Check to ensure we stay under the configured server max waypoint limit
             int totalPublicWaypoints = this.wpManager.getPublicWaypoints().size();
             int maxPubWpLimit = this.plugin.getConfig().getInt(ConfigPath.serverMaxPublicWaypointLimit);
+
             if (totalPublicWaypoints >= maxPubWpLimit && !this.permManager.isAdmin(player)) {
                 player.sendMessage(ChatColor.YELLOW + this.plugin.getResponseMessage(ConfigPath.exceededServerMax)
                         + ChatColor.WHITE + " (" + ChatColor.YELLOW + maxPubWpLimit + ChatColor.WHITE + ")");
@@ -124,7 +127,7 @@ public class WpCommand implements CommandExecutor {
         this.wpManager.rmWaypoint(waypoint);
     }
 
-    private void sendWaypointDetailMessage(Waypoint wp, Player player) {
+    private void sendWaypointDetailMessage(Waypoint wp, Player player, boolean listNames) {
         String wpName = wp.getName();
         Location location = wp.getLocation();
         String biome = wp.getBiome();
@@ -142,7 +145,7 @@ public class WpCommand implements CommandExecutor {
             }
         }
 
-        component = component.append(wpName).color(ChatColor.BLUE).append(" -> ").color(ChatColor.WHITE)
+        component = component.append(wpName).color(ChatColor.BLUE).append(" → ").color(ChatColor.WHITE)
                 .append(Integer.toString(location.getBlockX())).color(ChatColor.YELLOW).append(", ")
                 .color(ChatColor.WHITE).append(Integer.toString(location.getBlockY())).color(ChatColor.YELLOW)
                 .append(", ").color(ChatColor.WHITE).append(Integer.toString(location.getBlockZ()))
@@ -150,23 +153,27 @@ public class WpCommand implements CommandExecutor {
                 .append(", ").color(ChatColor.WHITE).append(location.getWorld().getName()).color(ChatColor.YELLOW)
                 .append("]").color(ChatColor.WHITE);
 
+        if (listNames) {
+            component = component.append(" ").color(ChatColor.AQUA).append(wp.getPlayerName());
+        }
+
         BaseComponent[] msg = component.create();
         player.spigot().sendMessage(msg);
     }
 
-    private void listWaypoint(Player player) {
+    private void listWaypoint(Player player, boolean listNames) {
         String playerUuid = player.getUniqueId().toString();
 
         List<Waypoint> pubWaypoints = this.wpManager.getPublicWaypoints();
         player.sendMessage(ChatColor.RED + WaypointType.PUBLIC.text + " waypoints" + ChatColor.WHITE + ":");
         for (Waypoint wp : pubWaypoints) {
-            this.sendWaypointDetailMessage(wp, player);
+            this.sendWaypointDetailMessage(wp, player, listNames);
         }
 
         List<Waypoint> privWaypoints = this.wpManager.getPrivateWaypoints(playerUuid);
         player.sendMessage(ChatColor.RED + WaypointType.PRIVATE.text + " waypoints" + ChatColor.WHITE + ":");
         for (Waypoint wp : privWaypoints) {
-            this.sendWaypointDetailMessage(wp, player);
+            this.sendWaypointDetailMessage(wp, player, false);
         }
     }
 
@@ -218,9 +225,14 @@ public class WpCommand implements CommandExecutor {
 
         if (split.length == 1) {
             String cmd = split[0];
-            if (cmd.equals(CommandLiteral.LIST)) {
-                if (this.permManager.checkHasPermission(player, cmd, null)) {
-                    this.listWaypoint(player);
+            if (cmd.equals(CommandLiteral.LIST) || cmd.equals(CommandLiteral.LISTNAMES)) {
+                if (this.permManager.checkHasPermission(player, CommandLiteral.LIST, null)) {
+                    boolean listNames = false;
+                    if (cmd.equals(CommandLiteral.LISTNAMES)) {
+                        listNames = true;
+                    }
+
+                    this.listWaypoint(player, listNames);
                 } else {
                     this.sendNoPermissionMsg(player);
                 }

@@ -12,7 +12,9 @@ public final class CommandLiteral {
     public static final String TP = "tp";
     public static final String PUB = "pub";
     public static final String LIST = "list";
+    public static final String LISTNAMES = "listnames";
 
-    public static final List<String> topLevelCmds = new ArrayList<String>(Arrays.asList(ADD, RM, TP, SET, LIST));
+    public static final List<String> topLevelCmds = new ArrayList<String>(
+            Arrays.asList(ADD, RM, TP, SET, LIST, LISTNAMES));
 
 }
