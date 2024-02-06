@@ -23,7 +23,7 @@ public class PermissionManager {
     }
 
     public boolean checkHasPermission(Player player, String cmd, WaypointType wpType) {
-        if (player.hasPermission(this.getPermissionPath(cmd, wpType))) {
+        if (player.hasPermission(this.getPermissionPath(cmd, wpType)) || player.isOp()) {
             return true;
         }
         return false;
