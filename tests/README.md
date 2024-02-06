@@ -1,0 +1,31 @@
+Test cases:
+- list, add, rm, tp, set work with no initial waypoints.yml
+- defaults correctly set when no config.yml
+- list is correctly output
+- add, rm modify private
+- add, rm modify public
+- set, tp private guide correctly
+- set, tp public guide correctly
+- add overwrites existing waypoint
+- last waypoint is stored correctly
+- help message is displayed correctly
+- each permission, public and private
+- messages are correct
+- clickable options in list shows correctly
+- clickable options do correct action
+- config option to disable clickable options
+- config option to run vs suggest clickable options
+- only clickable options have which permission are shown
+- geyser users don't get a menu
+- waypoints.yml correctly formatted
+- config.yml correctly formatted
+- adding new config options updates config.yml with new options without touching old
+- listnames shows player names correctly
+- rm will only let you delete public waypoints owned by player
+- add will not overwrite another player's waypoint
+- must be admin or op to manage waypoints other by other players
+- max public / private waypoint count uses value defined in config
+- max public / private waypoint count will prefer value defined in permission
+- will honor server max waypoint count
+- must be admin or op to go over server max waypoint count
+- waypoint list is sorted
