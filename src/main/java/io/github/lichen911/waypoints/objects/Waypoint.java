@@ -1,5 +1,7 @@
 package io.github.lichen911.waypoints.objects;
 
+import java.util.Comparator;
+
 import org.bukkit.Location;
 
 import io.github.lichen911.waypoints.enums.WaypointType;
@@ -10,6 +12,12 @@ public class Waypoint {
     private final String name;
     private final WaypointType type;
     private final Location location;
+
+    public static Comparator<Waypoint> COMPARE_BY_NAME = new Comparator<Waypoint>() {
+        public int compare(Waypoint one, Waypoint other) {
+            return one.name.compareTo(other.name);
+        }
+    };
 
     public Waypoint(String playerName, String playerUuid, String name, WaypointType type, Location location) {
         this.playerName = playerName;

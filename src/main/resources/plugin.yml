@@ -2,11 +2,16 @@ name: ${project.name}
 main: ${project.groupId}.waypoints.Waypoints
 version: ${project.version}
 api-version: 1.20
+author: lichen91
+website: https://www.spigotmc.org/resources/waypoints.114447/
 commands:
   wp:
     description: Manage and use waypoints.
     usage: "/wp"
 permissions:
+  waypoints.admin:
+    description: Admin privileges remove max waypoint limits and allows deleting public waypoints from any owner
+    default: false
   waypoints.private.add:
     description: Allows users to add waypoints to their private list
     default: true
@@ -34,3 +39,9 @@ permissions:
   waypoints.list:
     description: Allows users to list waypoints
     default: true
+  waypoints.private.limit.*:
+    description: Set the max number of allowed private waypoints for a user
+    default: false
+  waypoints.public.limit.*:
+    description: Set the max number of allowed public waypoints for a user
+    default: false

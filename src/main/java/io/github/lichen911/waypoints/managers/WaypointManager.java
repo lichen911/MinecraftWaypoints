@@ -18,6 +18,7 @@ public class WaypointManager {
     private final String configPlayersPrefix = "waypoints.players";
     private final String configLocPath = "loc";
     private final String configUserPath = "userName";
+    private final String configPublicOwnerPath = "owner";
 
     public WaypointManager(ConfigReader wpConfig) {
         this.wpConfig = wpConfig;
@@ -47,6 +48,12 @@ public class WaypointManager {
 
         this.wpConfig.getConfig().set(configPath + "." + configLocPath, location);
         this.wpConfig.getConfig().set(configPath + "." + configUserPath, playerName);
+
+        // Store the owner's UUID for public waypoints
+        if (wp.getWaypointType() == WaypointType.PUBLIC) {
+            this.wpConfig.getConfig().set(configPath + "." + configPublicOwnerPath, wp.getPlayerUuid());
+        }
+
         this.wpConfig.saveConfig();
     }
 
@@ -63,11 +70,21 @@ public class WaypointManager {
         String playerName = this.wpConfig.getConfig().getString(configPath + "." + configUserPath);
         Location location = this.getLocationFromConfig(playerUuid, wpName, wpType);
 
-        Waypoint waypoint = new Waypoint(playerName, playerUuid, wpName, wpType, location);
-        return waypoint;
+        // In the case of a public waypoint the returned Waypoint object should have the
+        // playerUuid of the owner of the waypoint
+        if (wpType == WaypointType.PUBLIC) {
+            playerUuid = this.wpConfig.getConfig().getString(configPath + "." + configPublicOwnerPath);
+        }
+
+        if (location != null) {
+            Waypoint waypoint = new Waypoint(playerName, playerUuid, wpName, wpType, location);
+            return waypoint;
+        }
+
+        return null;
     }
 
-    private List<Waypoint> getWaypointList(String configPrefix, WaypointType wpType) {
+    private List<Waypoint> getWaypointList(String configPrefix, WaypointType wpType, String playerUuid) {
         ConfigurationSection waypointConfigSection = this.wpConfig.getConfig().getConfigurationSection(configPrefix);
 
         List<Waypoint> waypoints = new ArrayList<Waypoint>();
@@ -76,21 +93,38 @@ public class WaypointManager {
 
             for (Map.Entry<String, Object> entry : waypointMap.entrySet()) {
                 String wpName = entry.getKey();
-                String wpLocPath = configPrefix + "." + wpName + "." + configLocPath;
+                String configPrefixWpName = configPrefix + "." + wpName;
+                String wpLocPath = configPrefixWpName + "." + configLocPath;
+                String wpUserName = this.wpConfig.getConfig().getString(configPrefixWpName + "." + configUserPath);
+                String wpOwnerUuid;
                 Location wpLoc = this.wpConfig.getConfig().getLocation(wpLocPath);
-                Waypoint waypoint = new Waypoint(null, null, wpName, wpType, wpLoc);
-                waypoints.add(waypoint);
+
+                if (wpType == WaypointType.PUBLIC) {
+                    wpOwnerUuid = this.wpConfig.getConfig().getString(configPrefixWpName + "." + configPublicOwnerPath);
+                } else {
+                    wpOwnerUuid = playerUuid;
+                }
+
+                Waypoint waypoint = new Waypoint(wpUserName, wpOwnerUuid, wpName, wpType, wpLoc);
+
+                if (playerUuid == null || playerUuid.equals(waypoint.getPlayerUuid())) {
+                    waypoints.add(waypoint);
+                }
             }
         }
         return waypoints;
     }
 
     public List<Waypoint> getPublicWaypoints() {
-        return this.getWaypointList(configPublicPrefix, WaypointType.PUBLIC);
+        return this.getWaypointList(configPublicPrefix, WaypointType.PUBLIC, null);
+    }
+
+    public List<Waypoint> getPublicWaypointsByOwner(String playerUuid) {
+        return this.getWaypointList(configPublicPrefix, WaypointType.PUBLIC, playerUuid);
     }
 
     public List<Waypoint> getPrivateWaypoints(String playerUuid) {
         String configPlayerPath = configPlayersPrefix + "." + playerUuid;
-        return this.getWaypointList(configPlayerPath, WaypointType.PRIVATE);
+        return this.getWaypointList(configPlayerPath, WaypointType.PRIVATE, null);
     }
 }
